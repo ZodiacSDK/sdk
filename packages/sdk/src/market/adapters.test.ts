@@ -191,9 +191,7 @@ describe("market adapters", () => {
       mockResponse({
         ok: true,
         payload: {
-          data: {
-            [token.mintAddress]: { price: "0.042" }
-          }
+          [token.mintAddress]: { usdPrice: "0.042" }
         }
       })
     ) as unknown as typeof fetch;
@@ -207,6 +205,24 @@ describe("market adapters", () => {
       volume24h: null,
       change24h: null,
       supply: null,
+      source: "jupiter",
+      status: "ok"
+    });
+  });
+
+  it("normalizes numeric Jupiter Price API V3 payloads", async () => {
+    const fetchImpl = vi.fn(async () =>
+      mockResponse({
+        ok: true,
+        payload: {
+          [token.mintAddress]: { usdPrice: 0.077 }
+        }
+      })
+    ) as unknown as typeof fetch;
+    const adapter = createJupiterMarketAdapter({ fetchImpl });
+
+    await expect(adapter.readMarket(options)).resolves.toMatchObject({
+      priceUsd: 0.077,
       source: "jupiter",
       status: "ok"
     });

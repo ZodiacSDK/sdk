@@ -23,3 +23,4 @@ export function App() {
 ```
 
 The SDK is read-only. It does not include signing, swaps, trading, custody, private keys, buy buttons, sell buttons, or transaction submission.
+Market adapters are optional display context. DEX Screener and Jupiter endpoints are upstream-controlled and can be overridden with `config.endpoint`.

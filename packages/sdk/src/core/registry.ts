@@ -251,8 +251,10 @@ export function getZodiacToken(
   return token;
 }
 
-export function getAllZodiacTokens(): readonly ZodiacToken[] {
-  return DEFAULT_ZODIAC_TOKENS;
+export function getAllZodiacTokens(
+  registry: ZodiacTokenRegistry = DEFAULT_ZODIAC_TOKEN_REGISTRY
+): readonly ZodiacToken[] {
+  return ZODIAC_SIGNS.map((sign) => getZodiacToken(sign, registry));
 }
 
 export function getMintAddress(

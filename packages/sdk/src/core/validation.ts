@@ -9,7 +9,7 @@ export function normalizeZodiacSign(value: string): ZodiacSign | null {
 }
 
 export function isZodiacSign(value: string): value is ZodiacSign {
-  return normalizeZodiacSign(value) === value;
+  return normalizeZodiacSign(value) !== null;
 }
 
 export function assertZodiacSign(value: string): ZodiacSign {

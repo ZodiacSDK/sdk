@@ -1,12 +1,10 @@
 import type { MarketAdapterConfig, ZodiacMarketAdapter } from "./types.js";
 import { unavailableMarketData } from "./unavailable.js";
 
-interface JupiterPriceResponse {
-  readonly data?: Record<string, { readonly price?: string | number }>;
-}
+type JupiterPriceResponse = Record<string, { readonly usdPrice?: string | number }>;
 
 export function createJupiterMarketAdapter(config: MarketAdapterConfig = {}): ZodiacMarketAdapter {
-  const endpoint = config.endpoint ?? "https://api.jup.ag/price/v2";
+  const endpoint = config.endpoint ?? "https://lite-api.jup.ag/price/v3";
   const fetchImpl = config.fetchImpl ?? globalThis.fetch;
 
   return {
@@ -66,7 +64,7 @@ export function createJupiterMarketAdapter(config: MarketAdapterConfig = {}): Zo
         });
       }
 
-      const priceValue = payload.data?.[options.token.mintAddress]?.price;
+      const priceValue = payload[options.token.mintAddress]?.usdPrice;
       const priceUsd = typeof priceValue === "string" ? Number(priceValue) : priceValue ?? null;
 
       if (priceUsd === null || !Number.isFinite(priceUsd)) {
@@ -99,15 +97,7 @@ function isJupiterPriceResponse(value: unknown): value is JupiterPriceResponse {
     return false;
   }
 
-  if (value.data === undefined) {
-    return true;
-  }
-
-  if (!isRecord(value.data)) {
-    return false;
-  }
-
-  return Object.values(value.data).every((entry) => entry === undefined || isRecord(entry));
+  return Object.values(value).every((entry) => entry === undefined || isRecord(entry));
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

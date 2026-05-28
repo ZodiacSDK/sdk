@@ -33,6 +33,7 @@ The workspace is managed with pnpm through `pnpm-workspace.yaml`.
 - Market data is optional display context.
 - Placeholder market data returns an unavailable snapshot by design.
 - DEX Screener and Jupiter adapters return normalized snapshots when usable data is available.
+- The default Jupiter adapter uses Jupiter Price API V3 through `https://lite-api.jup.ag/price/v3`; DEX Screener and Jupiter endpoints are overridable through adapter config.
 - Network failures, non-OK HTTP responses, JSON parse failures, missing markets, and malformed payloads return unavailable snapshots.
 - Ordinary network, API, and data failures should not throw from adapters.
 
@@ -66,7 +67,7 @@ Run package dry-runs from `packages/sdk`.
 - Market context is optional and may be unavailable.
 - Balance reads depend on the configured Solana RPC endpoint.
 - Public RPC endpoints may rate-limit or return transient failures.
-- The local audit workspace is not a git repository. Generated artifacts can be ignored by `.gitignore`, but tracked-file status and untracking cannot be verified in this workspace.
+- The temporary audit repository is `https://github.com/diasmal917/zodiacs-sdk`; the intended final public repository is `https://github.com/zodiacs-org/sdk`.
 
 ## Read-Only And Security Posture
 

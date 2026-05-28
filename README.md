@@ -109,6 +109,10 @@ and RPC failures are exposed as safe hook state.
 Market data is optional. Adapters return normalized snapshots when upstream data
 is available, and unavailable snapshots when network, API, or payload failures
 occur. Treat market context as display context only.
+DEX Screener and Jupiter endpoints are upstream-controlled. The default Jupiter
+adapter uses Jupiter Price API V3 through the keyless lite endpoint, and both
+market adapters accept `config.endpoint` when an integration needs to pin or
+replace an upstream URL.
 
 ```ts
 import {
