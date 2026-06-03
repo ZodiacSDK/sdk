@@ -27,11 +27,26 @@ jobs:
       - name: Install
         run: corepack pnpm install --frozen-lockfile
 
+      - name: Lint
+        run: corepack pnpm lint
+
       - name: Typecheck
         run: corepack pnpm typecheck
+
+      - name: Format
+        run: corepack pnpm format:check
+
+      - name: Registry checksum
+        run: corepack pnpm registry:checksum
 
       - name: Test
         run: corepack pnpm test
 
       - name: Build
         run: corepack pnpm build
+
+      - name: Pack dry run
+        run: corepack pnpm pack:dry-run
+
+      - name: Export smoke
+        run: corepack pnpm exports:smoke

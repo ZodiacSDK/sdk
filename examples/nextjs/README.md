@@ -2,7 +2,7 @@
 
 Minimal read-only integration demo for the Zodiacs SDK. The example presents
 Zodiacs.org cultural assets as symbolic identity and ownership surfaces with
-optional market context.
+official registry provenance.
 
 ## Setup
 
@@ -35,18 +35,17 @@ asset, and run a read-only balance lookup. The app passes
 `NEXT_PUBLIC_SOLANA_RPC_URL` to `ZodiacsProvider` as `rpcUrl`, so React balance
 hooks can use the first-party read-only Solana reader.
 
-The example does not request private keys, sign messages, execute swaps, execute
-trades, submit transactions, provide custody, or show buy or sell buttons. It
-uses `NEXT_PUBLIC_SOLANA_RPC_URL` for Solana RPC access.
+The example does not request private keys, sign messages, submit transactions,
+provide custody, or show acquisition or exchange buttons. It uses
+`NEXT_PUBLIC_SOLANA_RPC_URL` for Solana RPC access.
 
 ## What It Shows
 
-- Local Zodiacs token metadata from `@zodiacs/sdk`
-- `ZodiacAssetCard` and `ZodiacsPanel` from `@zodiacs/sdk`
+- Local Zodiacs token metadata from `@zodiacs/sdk/core`
+- `ZodiacAssetCard` and `ZodiacsPanel` from `@zodiacs/sdk/ui`
 - Read-only balance lookup with `getZodiacBalance`
 - React balance hooks through `ZodiacsProvider rpcUrl`
 - Ownership summary with `getZodiacsOwnership`
-- Placeholder market context through `useZodiacMarket`
 
-Market data is optional. Adapter failures surface as unavailable market context
-without blocking metadata or ownership UI.
+Market adapters are explicit through `@zodiacs/sdk/market` and are intentionally
+not part of this read-only UI example.

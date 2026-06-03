@@ -26,7 +26,9 @@ export const BASE_BRIDGED_ZODIAC_ADDRESSES = {
   pisces: "0x43fA1855a89b7A3e07426Fa7a1B44b4187d29Daf"
 } as const satisfies Record<ZodiacSign, string>;
 
-function createNativeRepresentation(token: (typeof DEFAULT_ZODIAC_TOKENS)[number]): ZodiacRepresentation {
+function createNativeRepresentation(
+  token: (typeof DEFAULT_ZODIAC_TOKENS)[number]
+): ZodiacRepresentation {
   return {
     sign: token.sign,
     chain: "solana",
@@ -140,8 +142,13 @@ export function getZodiacRepresentations(sign: ZodiacSign): readonly ZodiacRepre
   return getZodiacAsset(sign).representations;
 }
 
-export function getZodiacRepresentation(sign: ZodiacSign, chain: ZodiacChain): ZodiacRepresentation | null {
-  return getZodiacRepresentations(sign).find((representation) => representation.chain === chain) ?? null;
+export function getZodiacRepresentation(
+  sign: ZodiacSign,
+  chain: ZodiacChain
+): ZodiacRepresentation | null {
+  return (
+    getZodiacRepresentations(sign).find((representation) => representation.chain === chain) ?? null
+  );
 }
 
 export function getNativeZodiacRepresentation(sign: ZodiacSign): ZodiacRepresentation {
@@ -167,9 +174,13 @@ export function getAllOfficialRepresentations(sign?: ZodiacSign): readonly Zodia
 }
 
 export function getAllBaseBridgedZodiacs(): readonly ZodiacRepresentation[] {
-  return getAllOfficialRepresentations().filter((representation) => representation.chain === "base");
+  return getAllOfficialRepresentations().filter(
+    (representation) => representation.chain === "base"
+  );
 }
 
 export function getAllSolanaNativeZodiacs(): readonly ZodiacRepresentation[] {
-  return getAllOfficialRepresentations().filter((representation) => representation.chain === "solana");
+  return getAllOfficialRepresentations().filter(
+    (representation) => representation.chain === "solana"
+  );
 }

@@ -4,14 +4,21 @@
   "type": "module",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "build": "corepack pnpm --filter @zodiacs/sdk build",
-    "typecheck": "tsc -b --noEmit --pretty false",
+    "build": "corepack pnpm --filter @zodiacs/sdk build && corepack pnpm --filter zodiacs-base-app-example build && corepack pnpm --filter zodiacs-sdk-nextjs-example build",
+    "exports:smoke": "corepack pnpm --filter @zodiacs/sdk build && corepack pnpm --filter @zodiacs/sdk exports:smoke",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,json,md,yml,yaml}\"",
+    "lint": "corepack pnpm --filter @zodiacs/sdk typecheck",
+    "pack:dry-run": "cd packages/sdk && npm pack --dry-run",
+    "registry:checksum": "corepack pnpm --filter @zodiacs/sdk registry:checksum",
+    "typecheck": "corepack pnpm --filter @zodiacs/sdk typecheck && corepack pnpm --filter @zodiacs/sdk build && corepack pnpm --filter zodiacs-base-app-example typecheck && corepack pnpm --filter zodiacs-sdk-nextjs-example typecheck",
     "test": "vitest run --fileParallelism=false",
     "clean": "corepack pnpm -r exec rm -rf dist tsconfig.tsbuildinfo"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@vitejs/plugin-react": "^4.3.4",
+    "prettier": "^3.8.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tsup": "^8.3.5",

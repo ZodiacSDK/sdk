@@ -4,9 +4,12 @@ export { ZodiacMarketStrip, type ZodiacMarketStripProps } from "./ZodiacMarketSt
 export { ZodiacOwnershipBadge, type ZodiacOwnershipBadgeProps } from "./ZodiacOwnershipBadge.js";
 export {
   CosmicReceiptCard,
+  CompatibilityWheel,
   OfficialZodiacBadge,
   OfficialZodiacTokenCard,
   OfficialZodiacsGrid,
+  ProfileSummaryCard,
+  ShareCardPreview,
   UnverifiedZodiacWarning,
   ZodiacAddressVerifier,
   ZodiacBridgeProvenance,
@@ -15,5 +18,12 @@ export {
   ZodiacModalityComposition,
   ZodiacRepresentationBadge,
   ZodiacShelf,
+  ZodiacTokenCard,
   ZodiacWheel
+} from "./registry.js";
+export type {
+  CompatibilityWheelProps,
+  ProfileSummaryCardProps,
+  ShareCardPreviewProps,
+  ZodiacTokenCardProps
 } from "./registry.js";

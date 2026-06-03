@@ -1,7 +1,10 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
+  RegistryInvariantError,
   ZODIACS_REGISTRY,
+  assertValidZodiacsRegistrySchema,
   getAllBaseBridgedZodiacs,
   getAllSolanaNativeZodiacs,
   getBaseZodiacRepresentation,
@@ -12,6 +15,8 @@ import {
   isOfficialBaseZodiacAddress,
   isOfficialSolanaZodiacMint,
   isOfficialZodiacAddress,
+  normalizeZodiacsRegistry,
+  validateZodiacsRegistrySchema,
   type ZodiacSign,
   assertOfficialZodiacAddress
 } from "./index.js";
@@ -29,8 +34,12 @@ describe("canonical Zodiacs registry", () => {
 
   it("models Solana as the native canonical origin and Base as bridged", () => {
     for (const asset of ZODIACS_REGISTRY.assets) {
-      const solana = asset.representations.filter((representation) => representation.chain === "solana");
-      const base = asset.representations.filter((representation) => representation.chain === "base");
+      const solana = asset.representations.filter(
+        (representation) => representation.chain === "solana"
+      );
+      const base = asset.representations.filter(
+        (representation) => representation.chain === "base"
+      );
 
       expect(solana).toHaveLength(1);
       expect(base).toHaveLength(1);
@@ -60,13 +69,23 @@ describe("canonical Zodiacs registry", () => {
   });
 
   it("has unique addresses per chain and keeps Base out of canonical origin", () => {
-    const solanaAddresses = getAllSolanaNativeZodiacs().map((representation) => representation.address);
-    const baseAddresses = getAllBaseBridgedZodiacs().map((representation) => representation.address.toLowerCase());
+    const solanaAddresses = getAllSolanaNativeZodiacs().map(
+      (representation) => representation.address
+    );
+    const baseAddresses = getAllBaseBridgedZodiacs().map((representation) =>
+      representation.address.toLowerCase()
+    );
 
     expect(new Set(solanaAddresses).size).toBe(12);
     expect(new Set(baseAddresses).size).toBe(12);
-    expect(getAllBaseBridgedZodiacs().every((representation) => !representation.isCanonicalOrigin)).toBe(true);
-    expect(getAllBaseBridgedZodiacs().every((representation) => isOfficialBaseZodiacAddress(representation.address))).toBe(true);
+    expect(
+      getAllBaseBridgedZodiacs().every((representation) => !representation.isCanonicalOrigin)
+    ).toBe(true);
+    expect(
+      getAllBaseBridgedZodiacs().every((representation) =>
+        isOfficialBaseZodiacAddress(representation.address)
+      )
+    ).toBe(true);
   });
 
   it("keeps the JSON registry artifact in sync with the TypeScript registry", () => {
@@ -75,6 +94,85 @@ describe("canonical Zodiacs registry", () => {
     );
 
     expect(artifact).toEqual(ZODIACS_REGISTRY);
+  });
+
+  it("passes runtime schema and invariant validation", () => {
+    const result = validateZodiacsRegistrySchema(ZODIACS_REGISTRY);
+
+    expect(result).toEqual({ valid: true, issues: [], errors: [] });
+    expect(() => assertValidZodiacsRegistrySchema(ZODIACS_REGISTRY)).not.toThrow();
+    expect(normalizeZodiacsRegistry(ZODIACS_REGISTRY)).toEqual(ZODIACS_REGISTRY);
+  });
+
+  it("rejects missing representation metadata fields", () => {
+    const firstAsset = ZODIACS_REGISTRY.assets[0]!;
+    const invalidRegistry = {
+      ...ZODIACS_REGISTRY,
+      assets: [
+        {
+          ...firstAsset,
+          representations: firstAsset.representations.map((representation) =>
+            representation.chain === "base" ? { ...representation, symbol: "" } : representation
+          )
+        },
+        ...ZODIACS_REGISTRY.assets.slice(1)
+      ]
+    };
+    const result = validateZodiacsRegistrySchema(invalidRegistry);
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.map((issue) => issue.path)).toContain(
+      "$.assets[0].representations[1].symbol"
+    );
+  });
+
+  it("rejects duplicate signs, duplicate addresses, and mismatched bridge origins", () => {
+    const invalidRegistry = {
+      ...ZODIACS_REGISTRY,
+      assets: [
+        {
+          ...ZODIACS_REGISTRY.assets[0],
+          representations: ZODIACS_REGISTRY.assets[0]?.representations.map((representation) =>
+            representation.chain === "base"
+              ? { ...representation, originAddress: "EjkkxYpfSwS6TAtKKuiJuNMMngYvumc1t1v9ZX1WJKMp" }
+              : representation
+          )
+        },
+        {
+          ...ZODIACS_REGISTRY.assets[0],
+          native: {
+            ...ZODIACS_REGISTRY.assets[0]?.native,
+            address: ZODIACS_REGISTRY.assets[1]?.native.address
+          },
+          representations: ZODIACS_REGISTRY.assets[0]?.representations.map((representation) =>
+            representation.chain === "solana"
+              ? { ...representation, address: ZODIACS_REGISTRY.assets[1]?.native.address }
+              : representation
+          )
+        },
+        ...ZODIACS_REGISTRY.assets.slice(2)
+      ]
+    };
+    const result = validateZodiacsRegistrySchema(invalidRegistry);
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.map((issue) => issue.code)).toEqual(
+      expect.arrayContaining(["duplicate-sign", "duplicate-address", "invalid-origin"])
+    );
+    expect(() => assertValidZodiacsRegistrySchema(invalidRegistry)).toThrow(RegistryInvariantError);
+  });
+
+  it("stores a checksum for the registry artifact", () => {
+    const artifact = readFileSync(new URL("../../registry/zodiacs.registry.json", import.meta.url));
+    const checksum = readFileSync(
+      new URL("../../registry/zodiacs.registry.sha256", import.meta.url),
+      "utf8"
+    )
+      .trim()
+      .split(/\s+/u)[0];
+    const actual = createHash("sha256").update(artifact).digest("hex");
+
+    expect(actual).toBe(checksum);
   });
 
   it("verifies native Solana and bridged Base addresses", () => {

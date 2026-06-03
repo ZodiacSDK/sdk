@@ -10,7 +10,9 @@ function listTextFiles(directory: string): string[] {
     const stat = statSync(fullPath);
 
     if (stat.isDirectory()) {
-      return entry === "node_modules" || entry === "dist" || entry === ".next" ? [] : listTextFiles(fullPath);
+      return entry === "node_modules" || entry === "dist" || entry === ".next"
+        ? []
+        : listTextFiles(fullPath);
     }
 
     return /\.(md|json|ts|tsx)$/u.test(entry) ? [fullPath] : [];
@@ -28,7 +30,13 @@ describe("app-neutral canonical positioning", () => {
       join(repoRoot, "packages/sdk/package.json")
     ].filter((file) => !file.endsWith("docs-posture.test.ts"));
     const forbidden = new RegExp(
-      ["Astro" + "folio", "flagship" + "App", "poweredBy" + "App", "reference" + "App", "base-" + "native"].join("|"),
+      [
+        "Astro" + "folio",
+        "flagship" + "App",
+        "poweredBy" + "App",
+        "reference" + "App",
+        "base-" + "native"
+      ].join("|"),
       "iu"
     );
 

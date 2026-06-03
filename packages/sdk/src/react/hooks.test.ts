@@ -7,7 +7,6 @@ import {
   type SolanaBalanceConnection,
   type ZodiacBalanceResult
 } from "../core/index.js";
-import { createPlaceholderMarketAdapter } from "../market/index.js";
 import type { ZodiacsContextValue } from "./context.js";
 import type { AsyncHookState } from "./hooks.js";
 import type { PublicClient } from "viem";
@@ -23,6 +22,7 @@ vi.mock("react", async () => {
 
   return {
     ...actual,
+    useCallback: (callback: unknown) => callback,
     useEffect: (effect: () => void | (() => void), deps?: readonly unknown[]) => {
       mockState.latestEffectDeps = deps;
       effect();
@@ -38,7 +38,9 @@ vi.mock("react", async () => {
           const previous = mockState.latestHookState;
           mockState.latestHookState =
             typeof next === "function"
-              ? ((next as (currentState: unknown) => unknown)(previous) as AsyncHookState<ZodiacBalanceResult>)
+              ? ((next as (currentState: unknown) => unknown)(
+                  previous
+                ) as AsyncHookState<ZodiacBalanceResult>)
               : (next as AsyncHookState<ZodiacBalanceResult>);
         }
       ];
@@ -64,12 +66,9 @@ beforeEach(() => {
   mockState.latestHookState = null;
 });
 
-function createMockContext(
-  overrides: Partial<ZodiacsContextValue> = {}
-): ZodiacsContextValue {
+function createMockContext(overrides: Partial<ZodiacsContextValue> = {}): ZodiacsContextValue {
   return {
     balanceReader: null,
-    marketAdapter: createPlaceholderMarketAdapter(),
     registry: DEFAULT_ZODIAC_TOKEN_REGISTRY,
     ...overrides
   };
@@ -109,6 +108,7 @@ describe("useZodiacBalance", () => {
 
     expect(state.error).toBeNull();
     expect(state.loading).toBe(false);
+    expect(state.refetch).toEqual(expect.any(Function));
     expect(state.data).toMatchObject({
       balance: {
         amountRaw: "2000000",
@@ -136,7 +136,9 @@ describe("useZodiacBalance", () => {
     const connection: SolanaBalanceConnection = {
       getParsedTokenAccountsByOwner: vi.fn(async () => ({ value: [] }))
     };
-    mockState.contextValue = createMockContext({ balanceReader: createReadonlySolanaBalanceReader(connection) });
+    mockState.contextValue = createMockContext({
+      balanceReader: createReadonlySolanaBalanceReader(connection)
+    });
     const { useZodiacBalance } = await import("./hooks.js");
 
     useZodiacBalance("aries", "not-a-wallet");
@@ -156,7 +158,9 @@ describe("useZodiacBalance", () => {
         throw new Error("RPC unavailable");
       })
     };
-    mockState.contextValue = createMockContext({ balanceReader: createReadonlySolanaBalanceReader(connection) });
+    mockState.contextValue = createMockContext({
+      balanceReader: createReadonlySolanaBalanceReader(connection)
+    });
     const { useZodiacBalance } = await import("./hooks.js");
 
     useZodiacBalance("aries", walletAddress);
@@ -183,7 +187,8 @@ describe("useZodiacBalance", () => {
 
     useCrossChainZodiacsOwnership(params);
 
-    expect(mockState.latestEffectDeps).toEqual([connection, "", publicClient, ""]);
+    expect(mockState.latestEffectDeps?.slice(0, 4)).toEqual([connection, "", publicClient, ""]);
+    expect(mockState.latestEffectDeps?.[5]).toEqual(expect.any(Function));
     expect(mockState.latestEffectDeps).not.toContain(params);
   });
 
@@ -194,25 +199,47 @@ describe("useZodiacBalance", () => {
         { sign: "taurus", held: false }
       ]
     } as const;
-    const { useCurrentZodiacSeason, useCosmicReceiptData, useZodiacIdentityContext } = await import("./hooks.js");
+    const {
+      useCompatibilityContext,
+      useCurrentZodiacSeason,
+      useCosmicReceiptData,
+      useZodiacIdentityContext,
+      useZodiacWheelData
+    } = await import("./hooks.js");
 
     expect(useCurrentZodiacSeason(new Date("2026-03-22T00:00:00.000Z"))).toMatchObject({
       sign: "aries"
     });
-    expect(useZodiacIdentityContext(ownership, {
-      date: new Date("2026-03-22T00:00:00.000Z"),
-      sunSign: "aries"
-    })).toMatchObject({
+    expect(
+      useZodiacIdentityContext(ownership, {
+        date: new Date("2026-03-22T00:00:00.000Z"),
+        sunSign: "aries"
+      })
+    ).toMatchObject({
       heldSigns: ["aries"],
       currentSeasonHeld: true,
       alignments: [{ placement: "sun", sign: "aries", held: true }]
     });
-    expect(useCosmicReceiptData(ownership, {
-      date: new Date("2026-04-21T00:00:00.000Z")
-    })).toMatchObject({
+    expect(
+      useCosmicReceiptData(ownership, {
+        date: new Date("2026-04-21T00:00:00.000Z")
+      })
+    ).toMatchObject({
       label: "public Zodiacs shelf",
       currentSeason: { sign: "taurus" },
       currentSeasonHeld: false
+    });
+    expect(useZodiacWheelData(ownership)).toMatchObject({
+      heldSigns: ["aries"],
+      coverage: 8.33
+    });
+    expect(
+      useCompatibilityContext(ownership, {
+        holdings: [{ sign: "aries", held: true }]
+      })
+    ).toMatchObject({
+      sharedSigns: ["aries"],
+      overlapCount: 1
     });
   });
 });

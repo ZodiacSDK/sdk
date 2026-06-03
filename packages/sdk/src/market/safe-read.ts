@@ -8,13 +8,9 @@ export async function readMarketSafely(
   try {
     return await adapter.readMarket(options);
   } catch (error) {
-    return unavailableMarketData(
-      options,
-      adapter.id,
-      {
-        code: "adapter-error",
-        message: error instanceof Error ? error.message : "Market adapter failed."
-      }
-    );
+    return unavailableMarketData(options, adapter.id, {
+      code: "adapter-error",
+      message: error instanceof Error ? error.message : "Market adapter failed."
+    });
   }
 }

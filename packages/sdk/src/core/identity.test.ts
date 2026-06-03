@@ -1,14 +1,23 @@
 import { describe, expect, it } from "vitest";
 import {
   getCosmicReceiptData,
+  getCosmicReceiptFacts,
+  getCompatibilityContext,
   getCrossChainZodiacShelf,
+  getDominantElement,
+  getDominantModality,
   getElementComposition,
+  getSeasonalContext,
+  getShareCardContext,
   getZodiacIdentityContext,
   getZodiacReadingContext,
   getModalityComposition,
+  getZodiacWheelData,
+  mergeZodiacsOwnership,
   getNativeAndBridgedSummary,
   getOwnSignStatus,
   getTotalHeld,
+  getZunaSafeWalletContext,
   getZodiacWheelState
 } from "./index.js";
 
@@ -17,6 +26,27 @@ const ownership = {
     { sign: "aries", held: true },
     { sign: "taurus", held: false },
     { sign: "gemini", held: true }
+  ]
+} as const;
+
+const emptyOwnership = {
+  holdings: []
+} as const;
+
+const fullWheelOwnership = {
+  holdings: [
+    { sign: "aries", held: true },
+    { sign: "taurus", held: true },
+    { sign: "gemini", held: true },
+    { sign: "cancer", held: true },
+    { sign: "leo", held: true },
+    { sign: "virgo", held: true },
+    { sign: "libra", held: true },
+    { sign: "scorpio", held: true },
+    { sign: "sagittarius", held: true },
+    { sign: "capricorn", held: true },
+    { sign: "aquarius", held: true },
+    { sign: "pisces", held: true }
   ]
 } as const;
 
@@ -84,15 +114,21 @@ describe("identity composition helpers", () => {
       heldSigns: ["aries", "gemini"],
       missingSigns: expect.arrayContaining(["taurus", "cancer"]),
       totalHeld: 2,
+      totalUniqueSigns: 2,
       wheelCoverage: 16.67,
       elementComposition: { fire: 1, earth: 0, air: 1, water: 0 },
       modalityComposition: { cardinal: 1, fixed: 0, mutable: 1 },
+      nativeCount: 2,
+      bridgedCount: 0,
       currentSeason: {
         sign: "aries",
         startDate: "2026-03-21",
         endDate: "2026-04-19"
       },
       currentSeasonHeld: true,
+      dominantElement: null,
+      dominantModality: null,
+      shareTitle: "2 verified Zodiacs signs",
       alignments: [
         { placement: "sun", sign: "aries", held: true },
         { placement: "moon", sign: "taurus", held: false },
@@ -100,12 +136,15 @@ describe("identity composition helpers", () => {
       ]
     });
     expect(context.missingSigns).toHaveLength(10);
+    expect(context.receiptFacts.map((fact) => fact.label)).toContain("Wheel coverage");
   });
 
   it("reports when the current-season sign is not held", () => {
-    expect(getZodiacReadingContext(ownership, {
-      date: new Date("2026-04-21T00:00:00.000Z")
-    })).toMatchObject({
+    expect(
+      getZodiacReadingContext(ownership, {
+        date: new Date("2026-04-21T00:00:00.000Z")
+      })
+    ).toMatchObject({
       currentSeason: { sign: "taurus" },
       currentSeasonHeld: false
     });
@@ -133,9 +172,11 @@ describe("identity composition helpers", () => {
       } as never
     };
 
-    expect(getZodiacIdentityContext(ownershipByChain, {
-      date: new Date("2026-04-21T00:00:00.000Z")
-    })).toMatchObject({
+    expect(
+      getZodiacIdentityContext(ownershipByChain, {
+        date: new Date("2026-04-21T00:00:00.000Z")
+      })
+    ).toMatchObject({
       heldSigns: ["aries", "taurus"],
       currentSeason: { sign: "taurus" },
       currentSeasonHeld: true,
@@ -146,5 +187,159 @@ describe("identity composition helpers", () => {
         heldSigns: ["aries", "taurus"]
       }
     });
+  });
+
+  it("handles empty wallets with display-ready receipt facts", () => {
+    const context = getZodiacIdentityContext(emptyOwnership, {
+      date: new Date("2026-03-21T00:00:00.000Z")
+    });
+
+    expect(context).toMatchObject({
+      heldSigns: [],
+      missingSigns: expect.arrayContaining(["aries", "pisces"]),
+      totalUniqueSigns: 0,
+      wheelCoverage: 0,
+      nativeCount: 0,
+      bridgedCount: 0,
+      dominantElement: null,
+      dominantModality: null,
+      currentSeasonHeld: false,
+      shareTitle: "No verified Zodiacs holdings"
+    });
+    expect(context.receiptFacts).toContainEqual({ label: "Held signs", value: "0" });
+  });
+
+  it("handles one sign and full wheel coverage", () => {
+    expect(
+      getZodiacIdentityContext(
+        {
+          holdings: [{ sign: "leo", held: true }]
+        },
+        {
+          date: new Date("2026-07-24T00:00:00.000Z")
+        }
+      )
+    ).toMatchObject({
+      heldSigns: ["leo"],
+      wheelCoverage: 8.33,
+      dominantElement: "fire",
+      dominantModality: "fixed",
+      currentSeasonHeld: true
+    });
+
+    expect(getZodiacIdentityContext(fullWheelOwnership)).toMatchObject({
+      totalUniqueSigns: 12,
+      wheelCoverage: 100,
+      shareTitle: "12 verified Zodiacs signs"
+    });
+  });
+
+  it("deduplicates duplicated signs across Solana and Base", () => {
+    const ownershipByChain = {
+      solana: {
+        walletAddress: "solana-wallet",
+        chain: "solana",
+        status: "available",
+        holdings: [{ sign: "aries", held: true }],
+        heldSigns: ["aries"],
+        totalHeld: 1,
+        errors: []
+      } as never,
+      base: {
+        ownerAddress: "0x1111111111111111111111111111111111111111",
+        chain: "base",
+        status: "available",
+        holdings: [
+          { sign: "aries", held: true },
+          { sign: "taurus", held: true }
+        ],
+        heldSigns: ["aries", "taurus"],
+        totalHeld: 2,
+        errors: []
+      } as never
+    };
+
+    expect(mergeZodiacsOwnership(ownershipByChain).heldSigns).toEqual(["aries", "taurus"]);
+    expect(getZodiacIdentityContext(ownershipByChain)).toMatchObject({
+      heldSigns: ["aries", "taurus"],
+      totalUniqueSigns: 2,
+      nativeCount: 1,
+      bridgedCount: 2,
+      nativeBridgedSummary: {
+        nativeHeld: 1,
+        bridgedHeld: 2,
+        combinedHeld: 2
+      }
+    });
+  });
+
+  it("returns wheel, seasonal, and compatibility context", () => {
+    const wheel = getZodiacWheelData(ownership);
+    const seasonal = getSeasonalContext(ownership, {
+      date: new Date("2026-04-19T23:59:59.000Z")
+    });
+    const nextSeason = getSeasonalContext(ownership, {
+      date: new Date("2026-04-20T00:00:00.000Z")
+    });
+    const compatibility = getCompatibilityContext(ownership, {
+      holdings: [
+        { sign: "aries", held: true },
+        { sign: "cancer", held: true }
+      ]
+    });
+
+    expect(wheel).toMatchObject({
+      heldSigns: ["aries", "gemini"],
+      missingSigns: expect.arrayContaining(["taurus"]),
+      coverage: 16.67,
+      totalUniqueSigns: 2
+    });
+    expect(wheel.items).toHaveLength(12);
+    expect(seasonal).toMatchObject({
+      seasonSign: "aries",
+      currentSeasonHeld: true,
+      nextSeason: { sign: "taurus" }
+    });
+    expect(nextSeason).toMatchObject({
+      seasonSign: "taurus",
+      currentSeasonHeld: false
+    });
+    expect(compatibility).toMatchObject({
+      sharedSigns: ["aries"],
+      firstOnlySigns: ["gemini"],
+      secondOnlySigns: ["cancer"],
+      overlapCount: 1,
+      overlapPercentage: 50,
+      combinedCoverage: 25
+    });
+  });
+
+  it("exposes dominant, receipt, share card, and Zuna-safe context helpers", () => {
+    const zuna = getZunaSafeWalletContext(ownership, {
+      date: new Date("2026-03-22T00:00:00.000Z"),
+      publicAddress: "0x1111111111111111111111111111111111111111"
+    });
+    const serialized = JSON.stringify(zuna);
+
+    expect(getDominantElement({ holdings: [{ sign: "leo", held: true }] })).toBe("fire");
+    expect(getDominantModality({ holdings: [{ sign: "leo", held: true }] })).toBe("fixed");
+    expect(getCosmicReceiptFacts(ownership)).toEqual(
+      getZodiacIdentityContext(ownership).receiptFacts
+    );
+    expect(getShareCardContext(ownership)).toMatchObject({
+      title: "2 verified Zodiacs signs",
+      heldSigns: ["aries", "gemini"]
+    });
+    expect(zuna).toMatchObject({
+      connectedWalletLabel: "Connected wallet",
+      readOnly: true,
+      walletRequired: false,
+      verifiedZodiacHoldings: ["aries", "gemini"],
+      currentSeasonAppearsInWallet: true,
+      headline: "Optional Zodiacs context"
+    });
+    expect(serialized).not.toMatch(
+      /buy|sell|swap|invest|portfolio|market cap|profit|complete your wheel|missing sign|unlock|reward|token-gated/iu
+    );
   });
 });

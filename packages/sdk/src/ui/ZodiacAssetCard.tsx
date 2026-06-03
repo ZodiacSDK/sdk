@@ -1,12 +1,6 @@
 import type { CSSProperties } from "react";
-import {
-  formatZodiacBalance,
-  type ZodiacBalanceResult,
-  type ZodiacSign
-} from "../core/index.js";
-import type { ZodiacMarketData } from "../market/index.js";
-import { useZodiacBalance, useZodiacMarket, useZodiacToken } from "../react/index.js";
-import { ZodiacMarketStrip } from "./ZodiacMarketStrip.js";
+import { formatZodiacBalance, type ZodiacBalanceResult, type ZodiacSign } from "../core/index.js";
+import { useZodiacBalance, useZodiacToken } from "../react/index.js";
 import { ZodiacOwnershipBadge } from "./ZodiacOwnershipBadge.js";
 import { labelStyle, mutedTextStyle, rowStyle, surfaceStyle } from "./styles.js";
 
@@ -14,7 +8,9 @@ export interface ZodiacAssetCardProps {
   readonly sign: ZodiacSign;
   readonly ownerAddress?: string | null;
   readonly balance?: ZodiacBalanceResult | null;
-  readonly market?: ZodiacMarketData | null;
+  /** @deprecated SDK UI no longer renders market context. Import market helpers explicitly from @zodiacs/sdk/market. */
+  readonly market?: unknown;
+  /** @deprecated SDK UI no longer renders market context. */
   readonly showMarket?: boolean;
   readonly className?: string;
   readonly style?: CSSProperties;
@@ -25,15 +21,15 @@ export function ZodiacAssetCard({
   ownerAddress,
   balance: balanceProp,
   market: marketProp,
-  showMarket = true,
+  showMarket,
   className,
   style
 }: ZodiacAssetCardProps) {
+  void marketProp;
+  void showMarket;
   const { token } = useZodiacToken(sign);
   const balanceState = useZodiacBalance(sign, ownerAddress);
-  const marketState = useZodiacMarket(sign, { enabled: showMarket });
   const balance = balanceProp ?? balanceState.data;
-  const market = marketProp ?? marketState.data;
 
   return (
     <article
@@ -52,22 +48,24 @@ export function ZodiacAssetCard({
             {token.symbol}
           </span>
           <div style={{ minWidth: 0 }}>
-            <h3 style={{ fontSize: 20, fontWeight: 650, lineHeight: 1.15, margin: 0 }}>{token.name}</h3>
+            <h3 style={{ fontSize: 20, fontWeight: 650, lineHeight: 1.15, margin: 0 }}>
+              {token.name}
+            </h3>
             <p style={{ ...mutedTextStyle, fontSize: 13, margin: "4px 0 0" }}>{token.ticker}</p>
           </div>
         </div>
         <ZodiacOwnershipBadge balance={balance} />
       </header>
 
-      <p style={{ ...mutedTextStyle, fontSize: 14, lineHeight: 1.5, margin: 0 }}>{token.shortBio}</p>
+      <p style={{ ...mutedTextStyle, fontSize: 14, lineHeight: 1.5, margin: 0 }}>
+        {token.shortBio}
+      </p>
 
       <dl style={{ display: "grid", gap: 10, margin: 0 }}>
         <InfoRow label="Element" value={token.element} />
         <InfoRow label="Modality" value={token.modality} />
         <InfoRow label="Balance" value={formatZodiacBalance(balance?.balance ?? null, token)} />
       </dl>
-
-      {showMarket ? <ZodiacMarketStrip market={market} /> : null}
     </article>
   );
 }
@@ -76,7 +74,15 @@ function InfoRow({ label, value }: { readonly label: string; readonly value: str
   return (
     <div style={rowStyle}>
       <dt style={labelStyle}>{label}</dt>
-      <dd style={{ color: "#f3eadb", fontSize: 14, fontWeight: 600, margin: 0, textTransform: "capitalize" }}>
+      <dd
+        style={{
+          color: "#f3eadb",
+          fontSize: 14,
+          fontWeight: 600,
+          margin: 0,
+          textTransform: "capitalize"
+        }}
+      >
         {value}
       </dd>
     </div>

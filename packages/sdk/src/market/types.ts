@@ -3,7 +3,12 @@ import type { ZodiacSign, ZodiacToken } from "../core/index.js";
 export type MarketDataStatus = "ok" | "unavailable";
 
 export interface MarketDataError {
-  readonly code: "not-configured" | "no-market" | "http-error" | "invalid-response" | "adapter-error";
+  readonly code:
+    | "not-configured"
+    | "no-market"
+    | "http-error"
+    | "invalid-response"
+    | "adapter-error";
   readonly message: string;
 }
 

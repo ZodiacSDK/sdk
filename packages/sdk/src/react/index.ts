@@ -7,6 +7,7 @@ export {
 export {
   useBaseZodiacBalance,
   useBaseZodiacsOwnership,
+  useCompatibilityContext,
   useCosmicReceiptData,
   useCrossChainZodiacsOwnership,
   useCurrentZodiacSeason,
@@ -15,6 +16,7 @@ export {
   useSolanaZodiacsOwnership,
   useZodiacIdentityContext,
   useZodiacRepresentation,
+  useZodiacWheelData,
   useZodiacsRegistry,
   useZodiacBalance,
   useZodiacMarket,

@@ -65,7 +65,7 @@ export function createJupiterMarketAdapter(config: MarketAdapterConfig = {}): Zo
       }
 
       const priceValue = payload[options.token.mintAddress]?.usdPrice;
-      const priceUsd = typeof priceValue === "string" ? Number(priceValue) : priceValue ?? null;
+      const priceUsd = typeof priceValue === "string" ? Number(priceValue) : (priceValue ?? null);
 
       if (priceUsd === null || !Number.isFinite(priceUsd)) {
         return unavailableMarketData(options, "jupiter", {

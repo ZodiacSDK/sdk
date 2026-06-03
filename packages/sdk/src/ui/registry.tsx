@@ -7,13 +7,44 @@ import {
   getNativeCounterpart,
   getRepresentationByAddress,
   getZodiacAsset,
+  getZodiacIdentityContext,
+  getZodiacWheelData,
   getZodiacWheelState,
   isOfficialZodiacAddress,
+  type CosmicReceiptData,
+  type ZodiacCompatibilityContext,
   type ZodiacAddressLookupOptions,
+  type ZodiacIdentityContext,
+  type ZodiacIdentityOwnershipInput,
   type ZodiacRepresentation,
-  type ZodiacSign
+  type ZodiacSign,
+  type ZodiacWheelData,
+  type ZodiacWheelDataItem
 } from "../core/index.js";
 import { labelStyle, mutedTextStyle, surfaceStyle } from "./styles.js";
+
+export interface ZodiacTokenCardProps {
+  readonly item?: ZodiacWheelDataItem;
+  readonly sign?: ZodiacSign;
+  readonly representation?: ZodiacRepresentation;
+  readonly held?: boolean;
+  readonly style?: CSSProperties;
+}
+
+export interface ProfileSummaryCardProps {
+  readonly context: ZodiacIdentityContext;
+  readonly style?: CSSProperties;
+}
+
+export interface ShareCardPreviewProps {
+  readonly context: ZodiacIdentityContext | CosmicReceiptData;
+  readonly style?: CSSProperties;
+}
+
+export interface CompatibilityWheelProps {
+  readonly compatibility: ZodiacCompatibilityContext;
+  readonly style?: CSSProperties;
+}
 
 export function OfficialZodiacBadge({
   address,
@@ -24,7 +55,8 @@ export function OfficialZodiacBadge({
   readonly representation?: ZodiacRepresentation | null;
   readonly options?: ZodiacAddressLookupOptions;
 }) {
-  const resolved = representation ?? (address ? getRepresentationByAddress(address, options) : null);
+  const resolved =
+    representation ?? (address ? getRepresentationByAddress(address, options) : null);
 
   if (!resolved) {
     return <span style={badgeStyle}>Not found in the official Zodiacs.org registry</span>;
@@ -39,15 +71,27 @@ export function OfficialZodiacBadge({
   );
 }
 
-export function ZodiacRepresentationBadge({ representation }: { readonly representation: ZodiacRepresentation }) {
+export function ZodiacRepresentationBadge({
+  representation
+}: {
+  readonly representation: ZodiacRepresentation;
+}) {
   return <span style={badgeStyle}>{representation.kind === "native" ? "Native" : "Bridged"}</span>;
 }
 
-export function ZodiacChainBadge({ representation }: { readonly representation: ZodiacRepresentation }) {
+export function ZodiacChainBadge({
+  representation
+}: {
+  readonly representation: ZodiacRepresentation;
+}) {
   return <span style={badgeStyle}>{representation.chain === "solana" ? "Solana" : "Base"}</span>;
 }
 
-export function ZodiacBridgeProvenance({ representation }: { readonly representation: ZodiacRepresentation }) {
+export function ZodiacBridgeProvenance({
+  representation
+}: {
+  readonly representation: ZodiacRepresentation;
+}) {
   if (!representation.bridge) {
     return <p style={mutedTextStyle}>Native on Solana.</p>;
   }
@@ -85,10 +129,65 @@ export function OfficialZodiacTokenCard({
   );
 }
 
+export function ZodiacTokenCard({ item, sign, representation, held, style }: ZodiacTokenCardProps) {
+  const resolvedSign = item?.sign ?? sign ?? representation?.sign;
+
+  if (!resolvedSign) {
+    return <UnverifiedZodiacWarning />;
+  }
+
+  const asset = getZodiacAsset(resolvedSign);
+  const resolvedRepresentation = representation ?? asset.native;
+  const resolvedHeld = held ?? item?.held ?? false;
+
+  return (
+    <article style={{ ...surfaceStyle, display: "grid", gap: 10, padding: 14, ...style }}>
+      <header
+        style={{ alignItems: "start", display: "flex", gap: 12, justifyContent: "space-between" }}
+      >
+        <div>
+          <p style={labelStyle}>{asset.displayName}</p>
+          <h3 style={{ fontSize: 18, lineHeight: 1.2, margin: "4px 0 0" }}>
+            {resolvedRepresentation.symbol}
+          </h3>
+        </div>
+        <span style={resolvedHeld ? badgeStyle : quietBadgeStyle}>
+          {resolvedHeld ? "Held" : "Not held"}
+        </span>
+      </header>
+      <p style={mutedTextStyle}>
+        {asset.metadata.element} · {asset.metadata.modality}
+      </p>
+      <ZodiacBridgeProvenance representation={resolvedRepresentation} />
+    </article>
+  );
+}
+
 export function OfficialZodiacsGrid({ chain = "solana" }: { readonly chain?: "solana" | "base" }) {
   return (
-    <section style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
-      {(["aries", "taurus", "gemini", "cancer", "leo", "virgo", "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "pisces"] as const).map((sign) => (
+    <section
+      style={{
+        display: "grid",
+        gap: 16,
+        gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))"
+      }}
+    >
+      {(
+        [
+          "aries",
+          "taurus",
+          "gemini",
+          "cancer",
+          "leo",
+          "virgo",
+          "libra",
+          "scorpio",
+          "sagittarius",
+          "capricorn",
+          "aquarius",
+          "pisces"
+        ] as const
+      ).map((sign) => (
         <OfficialZodiacTokenCard key={sign} chain={chain} sign={sign} />
       ))}
     </section>
@@ -103,7 +202,9 @@ export function ZodiacAddressVerifier({
   readonly options?: ZodiacAddressLookupOptions;
 }) {
   const representation = getRepresentationByAddress(address, options);
-  const native = representation ? getNativeCounterpart(representation.address, { chain: representation.chain }) : null;
+  const native = representation
+    ? getNativeCounterpart(representation.address, { chain: representation.chain })
+    : null;
   const bridged = representation ? getBaseZodiacRepresentation(representation.sign) : null;
 
   if (!representation) {
@@ -130,54 +231,163 @@ export function UnverifiedZodiacWarning({ address }: { readonly address?: string
     <article style={{ ...surfaceStyle, padding: 16 }}>
       <p style={labelStyle}>Unverified</p>
       <p style={mutedTextStyle}>
-        {address ? `${address} is not found in the official Zodiacs.org registry.` : "Not found in the official Zodiacs.org registry."}
+        {address
+          ? `${address} is not found in the official Zodiacs.org registry.`
+          : "Not found in the official Zodiacs.org registry."}
       </p>
     </article>
   );
 }
 
-export function ZodiacShelf({ ownership }: { readonly ownership: { readonly holdings: readonly { readonly sign: ZodiacSign; readonly held: boolean }[] } }) {
-  const held = ownership.holdings.filter((holding) => holding.held);
+export function ZodiacShelf({
+  ownership,
+  wheel
+}: {
+  readonly ownership?: {
+    readonly holdings: readonly { readonly sign: ZodiacSign; readonly held: boolean }[];
+  };
+  readonly wheel?: ZodiacWheelData;
+}) {
+  const resolvedWheel = wheel ?? (ownership ? getZodiacWheelData(ownership) : null);
+  const held = resolvedWheel?.heldSigns ?? [];
 
   return (
     <section style={{ ...surfaceStyle, padding: 16 }}>
       <p style={labelStyle}>Public Zodiacs shelf</p>
-      <p style={mutedTextStyle}>{held.map((holding) => holding.sign).join(", ") || "No held signs found."}</p>
+      <p style={mutedTextStyle}>{held.join(", ") || "No held signs found."}</p>
     </section>
   );
 }
 
-export function ZodiacWheel({ ownership }: { readonly ownership: { readonly holdings: readonly { readonly sign: ZodiacSign; readonly held: boolean }[] } }) {
+export function ZodiacWheel({
+  ownership,
+  wheel
+}: {
+  readonly ownership?: {
+    readonly holdings: readonly { readonly sign: ZodiacSign; readonly held: boolean }[];
+  };
+  readonly wheel?: ZodiacWheelData;
+}) {
+  const items = wheel?.items ?? (ownership ? getZodiacWheelState(ownership) : []);
+
   return (
     <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
-      {getZodiacWheelState(ownership).map((item) => (
-        <span key={item.sign} style={item.held ? badgeStyle : quietBadgeStyle}>{item.sign}</span>
+      {items.map((item) => (
+        <span key={item.sign} style={item.held ? badgeStyle : quietBadgeStyle}>
+          {item.sign}
+        </span>
       ))}
     </div>
   );
 }
 
-export function ZodiacElementComposition({ ownership }: { readonly ownership: { readonly holdings: readonly { readonly sign: ZodiacSign; readonly held: boolean }[] } }) {
+export function ZodiacElementComposition({
+  ownership
+}: {
+  readonly ownership: {
+    readonly holdings: readonly { readonly sign: ZodiacSign; readonly held: boolean }[];
+  };
+}) {
   return <Composition title="Element mix" composition={getElementComposition(ownership)} />;
 }
 
-export function ZodiacModalityComposition({ ownership }: { readonly ownership: { readonly holdings: readonly { readonly sign: ZodiacSign; readonly held: boolean }[] } }) {
+export function ZodiacModalityComposition({
+  ownership
+}: {
+  readonly ownership: {
+    readonly holdings: readonly { readonly sign: ZodiacSign; readonly held: boolean }[];
+  };
+}) {
   return <Composition title="Modality mix" composition={getModalityComposition(ownership)} />;
 }
 
-export function CosmicReceiptCard({ ownership }: { readonly ownership: { readonly holdings: readonly { readonly sign: ZodiacSign; readonly held: boolean }[] } }) {
-  const receipt = getCosmicReceiptData(ownership);
+export function CosmicReceiptCard({
+  ownership,
+  receipt
+}: {
+  readonly ownership?: ZodiacIdentityOwnershipInput;
+  readonly receipt?: CosmicReceiptData;
+}) {
+  const resolvedReceipt =
+    receipt ??
+    (ownership ? getCosmicReceiptData(ownership) : getCosmicReceiptData({ holdings: [] }));
 
   return (
-    <article style={{ ...surfaceStyle, padding: 16 }}>
+    <article style={{ ...surfaceStyle, display: "grid", gap: 10, padding: 16 }}>
       <p style={labelStyle}>Cosmic receipt</p>
-      <p style={mutedTextStyle}>{receipt.label}</p>
-      <p>Total held: {receipt.totalHeld}</p>
+      <p style={mutedTextStyle}>{resolvedReceipt.label}</p>
+      {resolvedReceipt.receiptFacts.map((fact) => (
+        <VerifierRow key={fact.label} label={fact.label} value={fact.value} />
+      ))}
     </article>
   );
 }
 
-function Composition({ title, composition }: { readonly title: string; readonly composition: Record<string, number> }) {
+export function ProfileSummaryCard({ context, style }: ProfileSummaryCardProps) {
+  return (
+    <article style={{ ...surfaceStyle, display: "grid", gap: 10, padding: 16, ...style }}>
+      <p style={labelStyle}>Profile summary</p>
+      <h3 style={{ fontSize: 20, lineHeight: 1.2, margin: 0 }}>{context.shareTitle}</h3>
+      <p style={mutedTextStyle}>{context.shareDescription}</p>
+      <VerifierRow label="Wheel coverage" value={`${context.wheelCoverage}%`} />
+      <VerifierRow label="Solana native" value={String(context.nativeCount)} />
+      <VerifierRow label="Base bridged" value={String(context.bridgedCount)} />
+    </article>
+  );
+}
+
+export function ShareCardPreview({ context, style }: ShareCardPreviewProps) {
+  return (
+    <article
+      aria-label="Zodiacs share card preview"
+      style={{
+        ...surfaceStyle,
+        background: "#10131a",
+        display: "grid",
+        gap: 14,
+        maxWidth: 420,
+        padding: 18,
+        ...style
+      }}
+    >
+      <p style={labelStyle}>Zodiacs official registry</p>
+      <h3 style={{ color: "#f6ecd7", fontSize: 24, lineHeight: 1.15, margin: 0 }}>
+        {context.shareTitle}
+      </h3>
+      <p style={mutedTextStyle}>{context.shareDescription}</p>
+      <ZodiacWheel
+        wheel={getZodiacWheelData({
+          holdings: context.heldSigns.map((sign) => ({ sign, held: true }))
+        })}
+      />
+    </article>
+  );
+}
+
+export function CompatibilityWheel({ compatibility, style }: CompatibilityWheelProps) {
+  return (
+    <article style={{ ...surfaceStyle, display: "grid", gap: 12, padding: 16, ...style }}>
+      <p style={labelStyle}>Compatibility wheel</p>
+      <h3 style={{ fontSize: 20, lineHeight: 1.2, margin: 0 }}>{compatibility.shareTitle}</h3>
+      <p style={mutedTextStyle}>{compatibility.shareDescription}</p>
+      <VerifierRow label="Shared signs" value={compatibility.sharedSigns.join(", ") || "none"} />
+      <VerifierRow label="Combined coverage" value={`${compatibility.combinedCoverage}%`} />
+      <ZodiacWheel
+        wheel={getZodiacWheelData({
+          holdings: compatibility.combinedUniqueSigns.map((sign) => ({ sign, held: true }))
+        })}
+      />
+    </article>
+  );
+}
+
+function Composition({
+  title,
+  composition
+}: {
+  readonly title: string;
+  readonly composition: Record<string, number>;
+}) {
   return (
     <section style={{ ...surfaceStyle, padding: 16 }}>
       <p style={labelStyle}>{title}</p>

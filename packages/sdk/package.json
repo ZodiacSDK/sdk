@@ -1,6 +1,6 @@
 {
   "name": "@zodiacs/sdk",
-  "version": "0.2.0",
+  "version": "1.0.0-rc.1",
   "description": "Official read-only TypeScript SDK for the canonical Zodiacs.org registry, native Solana Zodiacs assets, and official bridged Base representations.",
   "license": "MIT",
   "keywords": [
@@ -36,6 +36,42 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js"
+    },
+    "./market": {
+      "types": "./dist/market.d.ts",
+      "import": "./dist/market.js"
+    },
+    "./registry": {
+      "types": "./dist/registry.d.ts",
+      "import": "./dist/registry.js"
+    },
+    "./base": {
+      "types": "./dist/base.d.ts",
+      "import": "./dist/base.js"
+    },
+    "./solana": {
+      "types": "./dist/solana.d.ts",
+      "import": "./dist/solana.js"
+    },
+    "./identity": {
+      "types": "./dist/identity.d.ts",
+      "import": "./dist/identity.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    },
+    "./ui": {
+      "types": "./dist/ui.d.ts",
+      "import": "./dist/ui.js"
+    },
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "import": "./dist/testing.js"
+    },
     "./registry/zodiacs.registry.json": {
       "default": "./registry/zodiacs.registry.json"
     }
@@ -43,6 +79,7 @@
   "files": [
     "dist",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE",
     "registry"
   ],
@@ -53,16 +90,24 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --clean --tsconfig tsconfig.build.json --external react --external react/jsx-runtime --external @solana/web3.js --external viem",
+    "build": "tsup src/index.ts src/core.ts src/market.ts src/registry.ts src/base.ts src/solana.ts src/identity.ts src/react.ts src/ui.ts src/testing.ts --format esm --dts --clean --tsconfig tsconfig.build.json --external react --external react/jsx-runtime --external @solana/web3.js --external viem",
+    "exports:smoke": "node scripts/module-resolution-smoke.mjs",
+    "prepack": "npm run build",
+    "registry:checksum": "node scripts/registry-checksum.mjs --check",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run src/**/*.test.ts src/**/*.test.tsx"
   },
   "dependencies": {
     "@solana/web3.js": "^1.98.0",
-    "viem": "^2.23.0"
+    "viem": "^2.45.0"
   },
   "peerDependencies": {
     "react": ">=18.2.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/react": "^18.3.12",

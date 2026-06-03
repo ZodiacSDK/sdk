@@ -1,4 +1,10 @@
-import { ZODIAC_SIGNS, type ZodiacRegistryValidationResult, type ZodiacSign, type ZodiacToken, type ZodiacTokenRegistry } from "./types.js";
+import {
+  ZODIAC_SIGNS,
+  type ZodiacRegistryValidationResult,
+  type ZodiacSign,
+  type ZodiacToken,
+  type ZodiacTokenRegistry
+} from "./types.js";
 import { validateZodiacToken } from "./validation.js";
 
 const marketLinks = (mintAddress: string) => ({
@@ -18,7 +24,8 @@ export const DEFAULT_ZODIAC_TOKENS = [
     rulingPlanet: "Mars",
     symbol: "♈",
     archetype: "The Initiator",
-    shortBio: "A cultural asset for symbolic identity expressed through origin, force, and first movement.",
+    shortBio:
+      "A cultural asset for symbolic identity expressed through origin, force, and first movement.",
     decimals: 6,
     mintAddress: "GhFiFrExPY3proVF96oth1gESWA5QPQzdtb8cy8b1YZv",
     marketLinks: marketLinks("GhFiFrExPY3proVF96oth1gESWA5QPQzdtb8cy8b1YZv")
@@ -201,9 +208,8 @@ export const DEFAULT_ZODIAC_TOKENS = [
   }
 ] as const satisfies readonly ZodiacToken[];
 
-export const DEFAULT_ZODIAC_TOKEN_REGISTRY: ZodiacTokenRegistry = createZodiacTokenRegistry(
-  DEFAULT_ZODIAC_TOKENS
-);
+export const DEFAULT_ZODIAC_TOKEN_REGISTRY: ZodiacTokenRegistry =
+  createZodiacTokenRegistry(DEFAULT_ZODIAC_TOKENS);
 
 export function createZodiacTokenRegistry(tokens: readonly ZodiacToken[]): ZodiacTokenRegistry {
   const registry = new Map<ZodiacSign, ZodiacToken>();
@@ -229,13 +235,12 @@ export function mergeZodiacTokenRegistry(
   overrides: readonly ZodiacToken[],
   baseRegistry: ZodiacTokenRegistry = DEFAULT_ZODIAC_TOKEN_REGISTRY
 ): ZodiacTokenRegistry {
-  return createZodiacTokenRegistry([...baseRegistry.values(), ...overrides].reduce<ZodiacToken[]>(
-    (tokens, token) => {
+  return createZodiacTokenRegistry(
+    [...baseRegistry.values(), ...overrides].reduce<ZodiacToken[]>((tokens, token) => {
       const withoutCurrent = tokens.filter((existing) => existing.sign !== token.sign);
       return [...withoutCurrent, token];
-    },
-    []
-  ));
+    }, [])
+  );
 }
 
 export function getZodiacToken(

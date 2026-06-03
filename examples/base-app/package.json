@@ -1,0 +1,29 @@
+{
+  "name": "zodiacs-base-app-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "typecheck": "rm -rf .next && tsc --noEmit --incremental false"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.11",
+    "@zodiacs/sdk": "workspace:*",
+    "next": "^15.0.4",
+    "ox": "^0.9.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "viem": "^2.45.0",
+    "wagmi": "^2.19.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.6.3"
+  },
+  "overrides": {
+    "@base-org/account": "latest"
+  }
+}

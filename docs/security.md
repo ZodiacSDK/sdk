@@ -17,3 +17,7 @@ It does not:
 The SDK is designed for registry verification, public balance reads, metadata,
 React hooks, and UI surfaces. Base helpers use `viem` `PublicClient` only.
 Solana helpers use read-only connection methods.
+
+Consumer apps should show provenance clearly and avoid implying unofficial
+assets are official. Do not use SDK UI for buy, sell, swap, reward, claim,
+approval, or price-prediction flows.

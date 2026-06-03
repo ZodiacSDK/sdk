@@ -52,12 +52,23 @@ export class UnsupportedZodiacsChainError extends ZodiacsValidationError {
   }
 }
 
+export class UnsupportedChainError extends UnsupportedZodiacsChainError {
+  override readonly name: string = "UnsupportedChainError";
+}
+
 export class UnofficialZodiacAddressError extends ZodiacsValidationError {
   override readonly name: string = "UnofficialZodiacAddressError";
 
   constructor(value: string) {
-    super("unofficial-zodiac-address", `Address not found in the official Zodiacs.org registry: ${value}`);
+    super(
+      "unofficial-zodiac-address",
+      `Address not found in the official Zodiacs.org registry: ${value}`
+    );
   }
+}
+
+export class UnknownZodiacAddressError extends UnofficialZodiacAddressError {
+  override readonly name: string = "UnknownZodiacAddressError";
 }
 
 export class ZodiacReadUnavailableError extends ZodiacsError {
@@ -68,10 +79,25 @@ export class ZodiacReadUnavailableError extends ZodiacsError {
   }
 }
 
+export class PartialOwnershipReadError extends ZodiacsError {
+  override readonly name: string = "PartialOwnershipReadError";
+
+  readonly errors: readonly { readonly code: string; readonly message: string }[];
+
+  constructor(errors: readonly { readonly code: string; readonly message: string }[]) {
+    super("zodiac-read-unavailable", errors.map((error) => error.message).join(" "));
+    this.errors = errors;
+  }
+}
+
 export class ZodiacRegistryIntegrityError extends ZodiacsError {
   override readonly name: string = "ZodiacRegistryIntegrityError";
 
   constructor(message: string) {
     super("zodiac-registry-integrity", message);
   }
+}
+
+export class RegistryInvariantError extends ZodiacRegistryIntegrityError {
+  override readonly name: string = "RegistryInvariantError";
 }

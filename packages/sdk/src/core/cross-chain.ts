@@ -1,10 +1,6 @@
-import type { PublicClient } from "viem";
-import {
-  getBaseZodiacsOwnership
-} from "./base.js";
-import {
-  getSolanaZodiacsOwnership
-} from "./solana.js";
+import { getBaseZodiacsOwnership } from "./base.js";
+import type { ZodiacsBasePublicClient } from "./base.js";
+import { getSolanaZodiacsOwnership } from "./solana.js";
 import { getCrossChainZodiacShelf } from "./identity.js";
 import type {
   BaseZodiacsOwnership,
@@ -20,7 +16,7 @@ export interface ZodiacHoldingsByChainParams {
     readonly ownerAddress: string;
   };
   readonly base?: {
-    readonly publicClient: PublicClient;
+    readonly publicClient: ZodiacsBasePublicClient;
     readonly ownerAddress: string;
   };
 }
@@ -53,5 +49,7 @@ export const getCrossChainZodiacsOwnership = getZodiacHoldingsByChain;
 export async function getUnifiedZodiacShelf(
   params: ZodiacHoldingsByChainParams
 ): Promise<UnifiedZodiacShelf> {
-  return getCrossChainZodiacShelf(await getCrossChainZodiacsOwnership(params) as CrossChainZodiacsOwnership);
+  return getCrossChainZodiacShelf(
+    (await getCrossChainZodiacsOwnership(params)) as CrossChainZodiacsOwnership
+  );
 }

@@ -145,6 +145,7 @@ export interface ParsedTokenAccountResponse {
       readonly data: {
         readonly parsed?: {
           readonly info?: {
+            readonly mint?: string;
             readonly tokenAmount?: ParsedTokenAccountAmount;
           };
         };
@@ -156,7 +157,7 @@ export interface ParsedTokenAccountResponse {
 export interface SolanaBalanceConnection {
   readonly getParsedTokenAccountsByOwner: (
     ownerAddress: unknown,
-    filter: { readonly mint: unknown }
+    filter: { readonly mint: unknown } | { readonly programId: unknown }
   ) => Promise<ParsedTokenAccountResponse>;
 }
 
@@ -202,13 +203,19 @@ export interface ZodiacsHolding {
 export type ZodiacsOwnershipStatus = "available" | "partial" | "unavailable";
 
 export interface ZodiacsOwnership {
+  readonly owner?: string;
   readonly walletAddress: string;
   readonly chain?: "solana";
+  readonly checkedAt?: string;
   readonly status: ZodiacsOwnershipStatus;
   readonly holdings: readonly ZodiacsHolding[];
   readonly heldSigns: readonly ZodiacSign[];
+  readonly zeroBalanceSigns?: readonly ZodiacSign[];
+  readonly balancesBySign?: Readonly<Record<ZodiacSign, ZodiacBalance>>;
+  readonly representations?: readonly ZodiacRepresentation[];
   readonly totalHeld: number;
   readonly errors: readonly ZodiacBalanceError[];
+  readonly warnings?: readonly ZodiacSerializableError[];
 }
 
 export interface ReadonlyZodiacBalanceReader {
@@ -259,6 +266,7 @@ export interface BaseZodiacBalance {
   readonly decimals: number;
   readonly status: ZodiacBalanceReadStatus;
   readonly error?: ZodiacSerializableError;
+  readonly warning?: ZodiacSerializableError;
 }
 
 export interface BaseZodiacsHolding {
@@ -269,13 +277,21 @@ export interface BaseZodiacsHolding {
 }
 
 export interface BaseZodiacsOwnership {
+  readonly owner: string;
   readonly ownerAddress: string;
   readonly chain: "base";
+  readonly checkedAt?: string;
+  readonly blockNumber?: bigint;
   readonly status: ZodiacsOwnershipStatus;
   readonly holdings: readonly BaseZodiacsHolding[];
   readonly heldSigns: readonly ZodiacSign[];
+  readonly zeroBalanceSigns?: readonly ZodiacSign[];
+  readonly missingSigns?: readonly ZodiacSign[];
+  readonly balancesBySign?: Readonly<Record<ZodiacSign, BaseZodiacBalance>>;
+  readonly representations?: readonly ZodiacRepresentation[];
   readonly totalHeld: number;
   readonly errors: readonly ZodiacSerializableError[];
+  readonly warnings?: readonly ZodiacSerializableError[];
 }
 
 export interface CrossChainZodiacsOwnership {
@@ -331,6 +347,81 @@ export interface ZodiacNativeBridgedSummary {
   readonly heldSigns: readonly ZodiacSign[];
 }
 
+export interface ZodiacReceiptFact {
+  readonly label: string;
+  readonly value: string;
+}
+
+export interface ZodiacWheelDataItem {
+  readonly sign: ZodiacSign;
+  readonly displayName: string;
+  readonly glyph?: string;
+  readonly held: boolean;
+  readonly nativeHeld: boolean;
+  readonly bridgedHeld: boolean;
+  readonly element: ZodiacElement;
+  readonly modality: ZodiacModality;
+}
+
+export interface ZodiacWheelData {
+  readonly items: readonly ZodiacWheelDataItem[];
+  readonly heldSigns: readonly ZodiacSign[];
+  readonly missingSigns: readonly ZodiacSign[];
+  readonly coverage: number;
+  readonly totalUniqueSigns: number;
+}
+
+export interface ZodiacSeasonalContext {
+  readonly currentSeason: ZodiacSeason;
+  readonly nextSeason: ZodiacSeason;
+  readonly currentSeasonHeld: boolean;
+  readonly seasonSign: ZodiacSign;
+  readonly seasonDisplayName: string;
+  readonly heldSigns: readonly ZodiacSign[];
+}
+
+export interface ZodiacCompatibilityContext {
+  readonly firstHeldSigns: readonly ZodiacSign[];
+  readonly secondHeldSigns: readonly ZodiacSign[];
+  readonly sharedSigns: readonly ZodiacSign[];
+  readonly firstOnlySigns: readonly ZodiacSign[];
+  readonly secondOnlySigns: readonly ZodiacSign[];
+  readonly overlapCount: number;
+  readonly overlapPercentage: number;
+  readonly combinedUniqueSigns: readonly ZodiacSign[];
+  readonly combinedCoverage: number;
+  readonly sharedElements: readonly ZodiacElement[];
+  readonly sharedModalities: readonly ZodiacModality[];
+  readonly shareTitle: string;
+  readonly shareDescription: string;
+}
+
+export interface ZodiacShareCardContext {
+  readonly title: string;
+  readonly description: string;
+  readonly heldSigns: readonly ZodiacSign[];
+  readonly wheelCoverage: number;
+  readonly currentSeason: ZodiacSeason;
+  readonly currentSeasonHeld: boolean;
+  readonly facts: readonly ZodiacReceiptFact[];
+}
+
+export interface ZunaSafeWalletContext {
+  readonly connectedWalletLabel: string;
+  readonly readOnly: true;
+  readonly walletRequired: false;
+  readonly publicAddress?: string;
+  readonly verifiedZodiacHoldings: readonly ZodiacSign[];
+  readonly currentSeason: ZodiacSeason;
+  readonly currentSeasonAppearsInWallet: boolean;
+  readonly optionalContextFacts: readonly ZodiacReceiptFact[];
+  readonly headline: string;
+  readonly description: string;
+  readonly emptyState: string;
+  readonly provenanceNote: string;
+  readonly safetyNote: string;
+}
+
 export interface ZodiacIdentityContext {
   readonly heldSigns: readonly ZodiacSign[];
   readonly missingSigns: readonly ZodiacSign[];
@@ -338,8 +429,16 @@ export interface ZodiacIdentityContext {
   readonly wheelCoverage: number;
   readonly elementComposition: Record<ZodiacElement, number>;
   readonly modalityComposition: Record<ZodiacModality, number>;
+  readonly nativeCount: number;
+  readonly bridgedCount: number;
+  readonly totalUniqueSigns: number;
   readonly currentSeason: ZodiacSeason;
   readonly currentSeasonHeld: boolean;
+  readonly dominantElement: ZodiacElement | null;
+  readonly dominantModality: ZodiacModality | null;
+  readonly shareTitle: string;
+  readonly shareDescription: string;
+  readonly receiptFacts: readonly ZodiacReceiptFact[];
   readonly nativeBridgedSummary?: ZodiacNativeBridgedSummary;
   readonly alignments: readonly ZodiacIdentityAlignment[];
 }

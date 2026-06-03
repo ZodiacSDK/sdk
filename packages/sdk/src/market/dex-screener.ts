@@ -14,7 +14,9 @@ interface DexScreenerResponse {
   readonly pairs?: readonly DexScreenerPair[] | null;
 }
 
-export function createDexScreenerMarketAdapter(config: MarketAdapterConfig = {}): ZodiacMarketAdapter {
+export function createDexScreenerMarketAdapter(
+  config: MarketAdapterConfig = {}
+): ZodiacMarketAdapter {
   const endpoint = config.endpoint ?? "https://api.dexscreener.com/latest/dex/tokens";
   const fetchImpl = config.fetchImpl ?? globalThis.fetch;
 
@@ -62,7 +64,8 @@ export function createDexScreenerMarketAdapter(config: MarketAdapterConfig = {})
       } catch (error) {
         return unavailableMarketData(options, "dex-screener", {
           code: "invalid-response",
-          message: error instanceof Error ? error.message : "DEX Screener response was not valid JSON."
+          message:
+            error instanceof Error ? error.message : "DEX Screener response was not valid JSON."
         });
       }
 

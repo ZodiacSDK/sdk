@@ -49,7 +49,9 @@ describe("ZodiacsProvider", () => {
     const balanceReader = element.props.value.balanceReader as ReadonlyZodiacBalanceReader | null;
     const token = getZodiacToken("aries");
 
-    await expect(balanceReader?.getTokenBalance(walletAddress, token.mintAddress, token)).resolves.toMatchObject({
+    await expect(
+      balanceReader?.getTokenBalance(walletAddress, token.mintAddress, token)
+    ).resolves.toMatchObject({
       amountRaw: "1250000",
       decimals: 6,
       mintAddress: token.mintAddress,

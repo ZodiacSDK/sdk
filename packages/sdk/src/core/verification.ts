@@ -1,4 +1,4 @@
-import { UnofficialZodiacAddressError, UnsupportedZodiacsChainError } from "./errors.js";
+import { UnknownZodiacAddressError, UnsupportedChainError } from "./errors.js";
 import {
   getAllOfficialRepresentations,
   getBaseZodiacRepresentation,
@@ -6,7 +6,12 @@ import {
   getZodiacAsset,
   getZodiacRepresentation
 } from "./official-registry.js";
-import { isEvmAddress, normalizeEvmAddress, normalizeZodiacAddress } from "./address.js";
+import {
+  isEvmAddress,
+  normalizeEvmAddress,
+  normalizeSolanaAddress,
+  normalizeZodiacAddress
+} from "./address.js";
 import type { ZodiacChain, ZodiacRepresentation, ZodiacSign } from "./types.js";
 
 export interface ZodiacAddressLookupOptions {
@@ -23,27 +28,38 @@ export function getRepresentationByAddress(
     return null;
   }
 
-  return getAllOfficialRepresentations().find((representation) => {
-    if (options.chain && representation.chain !== options.chain) {
-      return false;
-    }
+  return (
+    getAllOfficialRepresentations().find((representation) => {
+      if (options.chain && representation.chain !== options.chain) {
+        return false;
+      }
 
-    return normalizeLookupAddress(representation.address, representation.chain) === normalized;
-  }) ?? null;
+      return normalizeLookupAddress(representation.address, representation.chain) === normalized;
+    }) ?? null
+  );
 }
 
 export const isOfficialZodiacRepresentation = isOfficialZodiacAddress;
 
-export function isOfficialZodiacAddress(address: string, options: ZodiacAddressLookupOptions = {}): boolean {
+export function isOfficialZodiacAddress(
+  address: string,
+  options: ZodiacAddressLookupOptions = {}
+): boolean {
   return getRepresentationByAddress(address, options) !== null;
 }
 
-export function isNativeZodiacAddress(address: string, options: ZodiacAddressLookupOptions = {}): boolean {
+export function isNativeZodiacAddress(
+  address: string,
+  options: ZodiacAddressLookupOptions = {}
+): boolean {
   const representation = getRepresentationByAddress(address, options);
   return representation?.kind === "native";
 }
 
-export function isBridgedZodiacAddress(address: string, options: ZodiacAddressLookupOptions = {}): boolean {
+export function isBridgedZodiacAddress(
+  address: string,
+  options: ZodiacAddressLookupOptions = {}
+): boolean {
   const representation = getRepresentationByAddress(address, options);
   return representation?.kind === "bridged";
 }
@@ -56,10 +72,7 @@ export function isOfficialSolanaZodiacMint(address: string): boolean {
   return isOfficialZodiacAddress(address, { chain: "solana" });
 }
 
-export function getZodiacAssetByAddress(
-  address: string,
-  options: ZodiacAddressLookupOptions = {}
-) {
+export function getZodiacAssetByAddress(address: string, options: ZodiacAddressLookupOptions = {}) {
   const representation = getRepresentationByAddress(address, options);
   return representation ? getZodiacAsset(representation.sign) : null;
 }
@@ -78,13 +91,16 @@ export function assertOfficialZodiacAddress(
   const representation = getRepresentationByAddress(address, options);
 
   if (!representation) {
-    throw new UnofficialZodiacAddressError(address);
+    throw new UnknownZodiacAddressError(address);
   }
 
   return representation;
 }
 
-export function getBridgeProvenance(sign: ZodiacSign, targetChain: ZodiacChain): ZodiacRepresentation["bridge"] | null {
+export function getBridgeProvenance(
+  sign: ZodiacSign,
+  targetChain: ZodiacChain
+): ZodiacRepresentation["bridge"] | null {
   const representation = getZodiacRepresentation(sign, targetChain);
   return representation?.bridge ?? null;
 }
@@ -99,12 +115,17 @@ export function getOriginForRepresentation(
     return null;
   }
 
-  return representation.isCanonicalOrigin ? representation : getNativeZodiacRepresentation(representation.sign);
+  return representation.isCanonicalOrigin
+    ? representation
+    : getNativeZodiacRepresentation(representation.sign);
 }
 
 export const getNativeCounterpart = getOriginForRepresentation;
 
-export function getBridgedCounterpart(sign: ZodiacSign, targetChain: ZodiacChain): ZodiacRepresentation | null {
+export function getBridgedCounterpart(
+  sign: ZodiacSign,
+  targetChain: ZodiacChain
+): ZodiacRepresentation | null {
   if (targetChain === "solana") {
     return getNativeZodiacRepresentation(sign);
   }
@@ -113,14 +134,11 @@ export function getBridgedCounterpart(sign: ZodiacSign, targetChain: ZodiacChain
     return getBaseZodiacRepresentation(sign);
   }
 
-  throw new UnsupportedZodiacsChainError(targetChain);
+  throw new UnsupportedChainError(targetChain);
 }
 
 export function getCounterparts(sign: ZodiacSign): readonly ZodiacRepresentation[] {
-  return [
-    getNativeZodiacRepresentation(sign),
-    getBaseZodiacRepresentation(sign)
-  ];
+  return [getNativeZodiacRepresentation(sign), getBaseZodiacRepresentation(sign)];
 }
 
 export function getZodiacProvenance(sign: ZodiacSign): {
@@ -149,8 +167,20 @@ function normalizeLookupAddress(address: string, chain?: ZodiacChain): string | 
   }
 
   if (chain === "solana") {
-    return trimmed;
+    try {
+      return normalizeSolanaAddress(trimmed);
+    } catch {
+      return null;
+    }
   }
 
-  return isEvmAddress(trimmed) ? normalizeZodiacAddress(trimmed, "base").toLowerCase() : trimmed;
+  if (isEvmAddress(trimmed)) {
+    return normalizeZodiacAddress(trimmed, "base").toLowerCase();
+  }
+
+  try {
+    return normalizeZodiacAddress(trimmed, "solana");
+  } catch {
+    return null;
+  }
 }

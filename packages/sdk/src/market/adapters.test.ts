@@ -105,7 +105,9 @@ describe("market adapters", () => {
       });
 
       it(`${adapterCase.name} returns unavailable for non-OK HTTP responses`, async () => {
-        const fetchImpl = vi.fn(async () => mockResponse({ ok: false, status: 503 })) as unknown as typeof fetch;
+        const fetchImpl = vi.fn(async () =>
+          mockResponse({ ok: false, status: 503 })
+        ) as unknown as typeof fetch;
         const adapter = adapterCase.create({ fetchImpl });
 
         await expect(adapter.readMarket(options)).resolves.toMatchObject({

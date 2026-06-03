@@ -13,7 +13,11 @@ export function formatCompactNumber(value: number, locale = "en-US"): string {
   }).format(value);
 }
 
-export function formatCurrency(value: number | null | undefined, currency = "USD", locale = "en-US"): string {
+export function formatCurrency(
+  value: number | null | undefined,
+  currency = "USD",
+  locale = "en-US"
+): string {
   if (value === null || value === undefined || !Number.isFinite(value)) {
     return "Unavailable";
   }

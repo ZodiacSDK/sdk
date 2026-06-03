@@ -1,17 +1,34 @@
+import { PublicKey } from "@solana/web3.js";
 import { getAddress, isAddress } from "viem";
 import type { ZodiacChain } from "./types.js";
-import { isLikelyBase58Address } from "./validation.js";
+import { InvalidZodiacAddressError } from "./errors.js";
 
 export function isEvmAddress(address: string): boolean {
   return isAddress(address);
 }
 
 export function normalizeEvmAddress(address: string): string {
-  return getAddress(address);
+  const trimmed = address.trim();
+
+  if (!isAddress(trimmed)) {
+    throw new InvalidZodiacAddressError(address);
+  }
+
+  return getAddress(trimmed);
 }
 
 export function isSolanaAddressLike(address: string): boolean {
-  return isLikelyBase58Address(address);
+  return normalizeSolanaAddressOrNull(address) !== null;
+}
+
+export function normalizeSolanaAddress(address: string): string {
+  const normalized = normalizeSolanaAddressOrNull(address);
+
+  if (!normalized) {
+    throw new InvalidZodiacAddressError(address);
+  }
+
+  return normalized;
 }
 
 export function normalizeZodiacAddress(address: string, chain?: ZodiacChain): string {
@@ -22,8 +39,26 @@ export function normalizeZodiacAddress(address: string, chain?: ZodiacChain): st
   }
 
   if (chain === "solana") {
-    return trimmed;
+    return normalizeSolanaAddress(trimmed);
   }
 
-  return isEvmAddress(trimmed) ? normalizeEvmAddress(trimmed) : trimmed;
+  if (isEvmAddress(trimmed)) {
+    return normalizeEvmAddress(trimmed);
+  }
+
+  return normalizeSolanaAddress(trimmed);
+}
+
+function normalizeSolanaAddressOrNull(address: string): string | null {
+  const trimmed = address.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  try {
+    return new PublicKey(trimmed).toBase58();
+  } catch {
+    return null;
+  }
 }

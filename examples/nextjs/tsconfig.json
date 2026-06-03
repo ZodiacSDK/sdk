@@ -14,20 +14,14 @@
       }
     ],
     "paths": {
-      "@zodiacs/sdk": [
-        "../../packages/sdk/dist/index.d.ts"
-      ]
+      "@zodiacs/sdk": ["../../packages/sdk/dist/index.d.ts"],
+      "@zodiacs/sdk/core": ["../../packages/sdk/dist/core.d.ts"],
+      "@zodiacs/sdk/react": ["../../packages/sdk/dist/react.d.ts"],
+      "@zodiacs/sdk/ui": ["../../packages/sdk/dist/ui.d.ts"]
     },
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

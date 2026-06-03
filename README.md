@@ -36,6 +36,17 @@ pnpm add @zodiacs/sdk
 For Base read-only balance helpers, the SDK uses `viem` public clients. For
 Solana read-only balance helpers, it uses `@solana/web3.js` connections.
 
+Prefer subpath imports for new apps:
+
+```ts
+import { getZodiacIdentityContext } from "@zodiacs/sdk/core";
+import { getBaseZodiacsOwnership } from "@zodiacs/sdk/base";
+import { getSolanaZodiacsOwnership } from "@zodiacs/sdk/solana";
+import { useBaseZodiacsOwnership } from "@zodiacs/sdk/react";
+import { ProfileSummaryCard } from "@zodiacs/sdk/ui";
+import { createMockOwnership } from "@zodiacs/sdk/testing";
+```
+
 ## Verify an Address
 
 ```ts
@@ -114,20 +125,20 @@ const publicClient = createPublicClient({
 
 const ownership = await getBaseZodiacsOwnership(
   publicClient,
-  "0x1111111111111111111111111111111111111111"
+  "0x1111111111111111111111111111111111111111",
+  { blockTag: "safe", onPartialFailure: "warn" }
 );
 ```
 
 Base helpers use `PublicClient` only. They read ERC-20 `balanceOf` and
 `decimals`; they do not construct transactions or require wallet clients.
+Ownership reads batch `balanceOf` calls with `readContracts` when available and
+cache decimals per client, chain, and token address.
 
 ## Build a Cross-Chain Zodiac Shelf
 
 ```ts
-import {
-  getCrossChainZodiacsOwnership,
-  getUnifiedZodiacShelf
-} from "@zodiacs/sdk";
+import { getCrossChainZodiacsOwnership, getUnifiedZodiacShelf } from "@zodiacs/sdk";
 
 const ownershipByChain = await getCrossChainZodiacsOwnership({
   solana: { connection, ownerAddress: "CWKQJJYec89wcx871C8vmyTPc3jhsdoAYs5aGffUtELJ" },
@@ -158,7 +169,7 @@ import {
   getCurrentZodiacSeason,
   getCosmicReceiptData,
   getZodiacIdentityContext
-} from "@zodiacs/sdk";
+} from "@zodiacs/sdk/identity";
 
 const season = getCurrentZodiacSeason(new Date("2026-03-22T00:00:00.000Z"));
 const context = getZodiacIdentityContext(ownership, {
@@ -181,14 +192,15 @@ React integrations can use `useCurrentZodiacSeason`, `useZodiacIdentityContext`,
 and `useCosmicReceiptData` as thin deterministic wrappers around the same
 helpers.
 
+Additional app helpers include `getZodiacWheelData`,
+`getCompatibilityContext`, `getSeasonalContext`, and
+`mergeZodiacsOwnership`.
+
 ## React Components
 
 ```tsx
-import {
-  OfficialZodiacBadge,
-  ZodiacAddressVerifier,
-  ZodiacsProvider
-} from "@zodiacs/sdk";
+import { OfficialZodiacBadge, ZodiacAddressVerifier } from "@zodiacs/sdk/ui";
+import { ZodiacsProvider } from "@zodiacs/sdk/react";
 
 export function RegistrySurface() {
   return (
@@ -217,6 +229,9 @@ Market helpers are representation-aware, so apps can request context for a
 Solana native representation or a Base bridged representation without implying
 one universal cross-chain price.
 
+Import market adapters explicitly from `@zodiacs/sdk/market`. They are not
+exported from the root package.
+
 ## Security Posture
 
 Zodiacs SDK is read-only infrastructure. It does not request private keys, sign
@@ -225,6 +240,22 @@ transaction approval helpers.
 
 The package is intended for verification, public balance reads, metadata, and
 identity surfaces.
+
+## Guides
+
+- `docs/api-reference.md`
+- `docs/registry.md`
+- `docs/base-integration.md`
+- `docs/solana-integration.md`
+- `docs/react-hooks.md`
+- `docs/ui-components.md`
+- `docs/base-app-starter.md`
+- `docs/ios-react-native.md`
+- `docs/ios-zuna.md`
+- `docs/zodiacs-readonly-api.md`
+- `docs/threat-model.md`
+- `docs/performance.md`
+- `docs/migration.md`
 
 ## What This SDK Does Not Do
 

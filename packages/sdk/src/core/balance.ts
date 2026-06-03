@@ -1,7 +1,4 @@
-import {
-  DEFAULT_ZODIAC_TOKEN_REGISTRY,
-  getZodiacToken
-} from "./registry.js";
+import { DEFAULT_ZODIAC_TOKEN_REGISTRY, getZodiacToken } from "./registry.js";
 import {
   ZODIAC_SIGNS,
   type ReadZodiacsBalancesOptions,
@@ -16,7 +13,11 @@ export async function readZodiacBalance(
   const token = getZodiacToken(options.sign, registry);
 
   try {
-    const balance = await options.reader.getTokenBalance(options.ownerAddress, token.mintAddress, token);
+    const balance = await options.reader.getTokenBalance(
+      options.ownerAddress,
+      token.mintAddress,
+      token
+    );
 
     return {
       sign: options.sign,

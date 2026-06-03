@@ -6,17 +6,12 @@ import {
   type ReadonlyZodiacBalanceReader,
   type ZodiacTokenRegistry
 } from "../core/index.js";
-import {
-  createPlaceholderMarketAdapter,
-  type ZodiacMarketAdapter
-} from "../market/index.js";
-
-const defaultMarketAdapter = createPlaceholderMarketAdapter();
 
 export interface ZodiacsContextValue {
   readonly registry: ZodiacTokenRegistry;
   readonly balanceReader: ReadonlyZodiacBalanceReader | null;
-  readonly marketAdapter: ZodiacMarketAdapter;
+  /** @deprecated Import market helpers explicitly from @zodiacs/sdk/market. */
+  readonly marketAdapter?: unknown;
 }
 
 export interface ZodiacsProviderProps {
@@ -24,13 +19,13 @@ export interface ZodiacsProviderProps {
   readonly registry?: ZodiacTokenRegistry;
   readonly balanceReader?: ReadonlyZodiacBalanceReader | null;
   readonly rpcUrl?: ConnectionOrRpcUrl;
-  readonly marketAdapter?: ZodiacMarketAdapter;
+  /** @deprecated Import market helpers explicitly from @zodiacs/sdk/market. */
+  readonly marketAdapter?: unknown;
 }
 
 const ZodiacsContext = createContext<ZodiacsContextValue>({
   registry: DEFAULT_ZODIAC_TOKEN_REGISTRY,
-  balanceReader: null,
-  marketAdapter: defaultMarketAdapter
+  balanceReader: null
 });
 
 export function ZodiacsProvider({
@@ -38,7 +33,7 @@ export function ZodiacsProvider({
   registry = DEFAULT_ZODIAC_TOKEN_REGISTRY,
   balanceReader,
   rpcUrl,
-  marketAdapter = defaultMarketAdapter
+  marketAdapter
 }: ZodiacsProviderProps) {
   const rpcBalanceReader = useMemo(
     () => (rpcUrl ? createReadonlySolanaBalanceReader(rpcUrl) : null),
@@ -47,7 +42,13 @@ export function ZodiacsProvider({
   const resolvedBalanceReader = balanceReader === undefined ? rpcBalanceReader : balanceReader;
 
   return (
-    <ZodiacsContext.Provider value={{ registry, balanceReader: resolvedBalanceReader, marketAdapter }}>
+    <ZodiacsContext.Provider
+      value={{
+        registry,
+        balanceReader: resolvedBalanceReader,
+        ...(marketAdapter === undefined ? {} : { marketAdapter })
+      }}
+    >
       {children}
     </ZodiacsContext.Provider>
   );

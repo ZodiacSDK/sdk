@@ -22,6 +22,7 @@ Machine-readable artifact:
 
 ```txt
 packages/sdk/registry/zodiacs.registry.json
+packages/sdk/registry/zodiacs.registry.sha256
 ```
 
 Primary helpers:
@@ -32,6 +33,12 @@ Primary helpers:
 - `isOfficialZodiacAddress`
 - `getNativeCounterpart`
 - `getBridgedCounterpart`
+- `validateZodiacsRegistrySchema`
+- `normalizeZodiacsRegistry`
+
+Registry updates should be reviewed as official-address changes. Do not alter addresses unless the current
+registry is proven internally inconsistent or maintainers provide authoritative replacement data. After any
+registry artifact change, run the invariant tests and update the SHA-256 checksum.
 
 ## Identity Context
 

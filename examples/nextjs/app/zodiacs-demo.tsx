@@ -4,18 +4,16 @@ import { useState } from "react";
 import {
   ZodiacsValidationError,
   getZodiacsOwnership,
-  ZodiacsPanel,
-  ZodiacsProvider,
   getHeldZodiacs,
   getZodiacBalance,
-  useZodiacMarket,
-  ZodiacAssetCard,
   ZODIAC_SIGNS,
   type ZodiacsHolding,
   type ZodiacsOwnership,
   type ZodiacBalance,
   type ZodiacSign
-} from "@zodiacs/sdk";
+} from "@zodiacs/sdk/core";
+import { ZodiacsProvider } from "@zodiacs/sdk/react";
+import { ZodiacAssetCard, ZodiacsPanel } from "@zodiacs/sdk/ui";
 
 interface ZodiacsDemoProps {
   readonly initialRpcUrl: string;
@@ -69,7 +67,8 @@ export function ZodiacsDemo({ initialRpcUrl }: ZodiacsDemoProps) {
       if (balance.status === "unavailable" || ownership.status === "unavailable") {
         setState({
           status: "rpc-unavailable",
-          message: balance.error?.message ?? ownership.errors[0]?.message ?? "Solana RPC is unavailable."
+          message:
+            balance.error?.message ?? ownership.errors[0]?.message ?? "Solana RPC is unavailable."
         });
         return;
       }
@@ -95,8 +94,8 @@ export function ZodiacsDemo({ initialRpcUrl }: ZodiacsDemoProps) {
           <p style={styles.eyebrow}>Zodiacs SDK Example</p>
           <h1 style={styles.title}>Twelve signs. Cultural assets for symbolic identity.</h1>
           <p style={styles.deck}>
-            A minimal integration surface for metadata, wallet balance reads, ownership state, and optional market
-            context.
+            A minimal integration surface for metadata, wallet balance reads, ownership state, and
+            official registry provenance.
           </p>
         </header>
 
@@ -137,10 +136,9 @@ export function ZodiacsDemo({ initialRpcUrl }: ZodiacsDemoProps) {
           <div style={styles.assetColumn}>
             <div style={styles.sectionHeader}>
               <p style={styles.eyebrow}>Selected asset</p>
-              <h2 style={styles.sectionTitle}>Metadata and market context</h2>
+              <h2 style={styles.sectionTitle}>Metadata and ownership context</h2>
             </div>
-            <ZodiacAssetCard ownerAddress={selectedOwnerAddress} sign={selectedSign} showMarket />
-            <MarketPlaceholder sign={selectedSign} />
+            <ZodiacAssetCard ownerAddress={selectedOwnerAddress} sign={selectedSign} />
           </div>
 
           <div style={styles.panelColumn}>
@@ -169,7 +167,9 @@ function StatusPanel({
     return (
       <section style={styles.notice}>
         <p style={styles.label}>Configuration</p>
-        <p style={styles.noticeText}>Set NEXT_PUBLIC_SOLANA_RPC_URL before running balance lookup.</p>
+        <p style={styles.noticeText}>
+          Set NEXT_PUBLIC_SOLANA_RPC_URL before running balance lookup.
+        </p>
       </section>
     );
   }
@@ -178,7 +178,9 @@ function StatusPanel({
     return (
       <section style={styles.notice}>
         <p style={styles.label}>Awaiting wallet</p>
-        <p style={styles.noticeText}>Enter a public wallet address to read zodiac token balances.</p>
+        <p style={styles.noticeText}>
+          Enter a public wallet address to read zodiac token balances.
+        </p>
       </section>
     );
   }
@@ -219,29 +221,19 @@ function StatusPanel({
     <section style={styles.resultGrid}>
       <Metric label={`${selectedSign} balance`} value={selectedBalanceText} />
       <Metric label="Held zodiac assets" value={String(state.ownership.totalHeld)} />
-      <Metric label="Ownership state" value={state.held.length > 0 ? "Holdings found" : "No holdings"} />
+      <Metric
+        label="Ownership state"
+        value={state.held.length > 0 ? "Holdings found" : "No holdings"}
+      />
       {state.held.length === 0 ? (
-        <p style={styles.fullWidthText}>This wallet has no Zodiacs holdings in the current registry.</p>
+        <p style={styles.fullWidthText}>
+          This wallet has no Zodiacs holdings in the current registry.
+        </p>
       ) : (
         <p style={styles.fullWidthText}>
           Held signs: {state.held.map((holding) => holding.token.name).join(", ")}
         </p>
       )}
-    </section>
-  );
-}
-
-function MarketPlaceholder({ sign }: { readonly sign: ZodiacSign }) {
-  const market = useZodiacMarket(sign);
-
-  return (
-    <section style={styles.notice}>
-      <p style={styles.label}>Market context</p>
-      <p style={styles.noticeText}>
-        {market.data?.status === "unavailable"
-          ? market.data.error?.message ?? "Market context is unavailable."
-          : "Market context adapter is ready for configuration."}
-      </p>
     </section>
   );
 }

@@ -64,17 +64,25 @@ export function getZodiacSeasonProgress(date: Date = new Date()): ZodiacSeasonPr
 }
 
 function getSeasonDefinitionForDate(date: Date): ZodiacSeasonDefinition {
-  return ZODIAC_SEASONS.find((definition) => {
-    const startYear = getStartYearForSeason(definition, date);
-    const start = utcDate(startYear, definition.startMonth, definition.startDay);
-    const endYear = definition.endMonth < definition.startMonth ? startYear + 1 : startYear;
-    const endExclusive = new Date(utcDate(endYear, definition.endMonth, definition.endDay).getTime() + MS_PER_DAY);
+  return (
+    ZODIAC_SEASONS.find((definition) => {
+      const startYear = getStartYearForSeason(definition, date);
+      const start = utcDate(startYear, definition.startMonth, definition.startDay);
+      const endYear = definition.endMonth < definition.startMonth ? startYear + 1 : startYear;
+      const endExclusive = new Date(
+        utcDate(endYear, definition.endMonth, definition.endDay).getTime() + MS_PER_DAY
+      );
 
-    return date.getTime() >= start.getTime() && date.getTime() < endExclusive.getTime();
-  }) ?? ZODIAC_SEASONS[0]!;
+      return date.getTime() >= start.getTime() && date.getTime() < endExclusive.getTime();
+    }) ?? ZODIAC_SEASONS[0]!
+  );
 }
 
-function buildSeason(definition: ZodiacSeasonDefinition, dateInSeason: Date, isCurrent: boolean): ZodiacSeason {
+function buildSeason(
+  definition: ZodiacSeasonDefinition,
+  dateInSeason: Date,
+  isCurrent: boolean
+): ZodiacSeason {
   const startYear = getStartYearForSeason(definition, dateInSeason);
   const endYear = definition.endMonth < definition.startMonth ? startYear + 1 : startYear;
   const asset = getZodiacAsset(definition.sign);
@@ -91,7 +99,10 @@ function buildSeason(definition: ZodiacSeasonDefinition, dateInSeason: Date, isC
 function getStartYearForSeason(definition: ZodiacSeasonDefinition, date: Date): number {
   const year = date.getUTCFullYear();
 
-  if (definition.endMonth < definition.startMonth && date.getUTCMonth() + 1 <= definition.endMonth) {
+  if (
+    definition.endMonth < definition.startMonth &&
+    date.getUTCMonth() + 1 <= definition.endMonth
+  ) {
     return year - 1;
   }
 
