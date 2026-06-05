@@ -257,9 +257,14 @@ export function getZodiacIdentityContext(
     wheelCoverage: getWheelCoverage(totalUniqueSigns),
     elementComposition,
     modalityComposition,
-    nativeCount: nativeBridgedSummary.nativeHeld,
-    bridgedCount: nativeBridgedSummary.bridgedHeld,
+    nativeHeldSigns: nativeBridgedSummary.nativeHeldSigns,
+    bridgedHeldSigns: nativeBridgedSummary.bridgedHeldSigns,
+    dualRepresentationSigns: nativeBridgedSummary.dualRepresentationSigns,
+    nativeCount: nativeBridgedSummary.nativeCount,
+    bridgedCount: nativeBridgedSummary.bridgedCount,
+    dualRepresentationCount: nativeBridgedSummary.dualRepresentationCount,
     totalUniqueSigns,
+    totalRepresentationPositions: nativeBridgedSummary.totalRepresentationPositions,
     currentSeason,
     currentSeasonHeld,
     dominantElement,
@@ -277,8 +282,11 @@ export function getZodiacIdentityContext(
       currentSeasonHeld,
       dominantElement,
       dominantModality,
-      nativeCount: nativeBridgedSummary.nativeHeld,
-      bridgedCount: nativeBridgedSummary.bridgedHeld
+      nativeCount: nativeBridgedSummary.nativeCount,
+      bridgedCount: nativeBridgedSummary.bridgedCount,
+      dualRepresentationCount: nativeBridgedSummary.dualRepresentationCount,
+      totalUniqueSigns: nativeBridgedSummary.totalUniqueSigns,
+      totalRepresentationPositions: nativeBridgedSummary.totalRepresentationPositions
     }),
     nativeBridgedSummary,
     alignments: getIdentityAlignments(heldSigns, options)
@@ -324,20 +332,15 @@ export function getCrossChainZodiacShelf(
 
 export const mergeZodiacsOwnership = getCrossChainZodiacShelf;
 
-export function getNativeAndBridgedSummary(ownershipByChain: CrossChainZodiacsOwnership): {
-  readonly nativeHeld: number;
-  readonly bridgedHeld: number;
-  readonly combinedHeld: number;
-  readonly heldSigns: readonly ZodiacSign[];
-} {
+export function getNativeAndBridgedSummary(
+  ownershipByChain: CrossChainZodiacsOwnership
+): ZodiacNativeBridgedSummary {
   const shelf = getCrossChainZodiacShelf(ownershipByChain);
 
-  return {
-    nativeHeld: shelf.items.filter((item) => item.nativeHeld).length,
-    bridgedHeld: shelf.items.filter((item) => item.bridgedHeld).length,
-    combinedHeld: shelf.totalHeld,
-    heldSigns: shelf.heldSigns
-  };
+  return buildNativeBridgedSummary(
+    shelf.items.filter((item) => item.nativeHeld).map((item) => item.sign),
+    shelf.items.filter((item) => item.bridgedHeld).map((item) => item.sign)
+  );
 }
 
 export function getSeasonalContext(
@@ -553,13 +556,7 @@ function isHeldByRepresentation(
       return false;
     }
 
-    const holdingKind = holding.representation?.kind ?? holding.balance?.kind;
-
-    if (!holdingKind) {
-      return kind === "native";
-    }
-
-    return holdingKind === kind;
+    return getHoldingRepresentationKind(holding) === kind;
   });
 }
 
@@ -567,28 +564,74 @@ function getNativeAndBridgedSummaryFromOwnership(
   ownership: OwnershipLike
 ): ZodiacNativeBridgedSummary {
   const held = getZodiacShelf(ownership);
-  let nativeHeld = 0;
-  let bridgedHeld = 0;
+  const nativeHeldSigns: ZodiacSign[] = [];
+  const bridgedHeldSigns: ZodiacSign[] = [];
 
   for (const sign of getHeldSigns(ownership)) {
     const signHoldings = held.filter((holding) => holding.sign === sign);
-    const hasBridged = signHoldings.some(
-      (holding) => holding.representation?.kind === "bridged" || holding.balance?.kind === "bridged"
-    );
+    const heldKinds = new Set(signHoldings.map((holding) => getHoldingRepresentationKind(holding)));
 
-    if (hasBridged) {
-      bridgedHeld += 1;
-    } else {
-      nativeHeld += 1;
+    if (heldKinds.has("native")) {
+      nativeHeldSigns.push(sign);
+    }
+
+    if (heldKinds.has("bridged")) {
+      bridgedHeldSigns.push(sign);
     }
   }
 
+  return buildNativeBridgedSummary(nativeHeldSigns, bridgedHeldSigns);
+}
+
+function getHoldingRepresentationKind(holding: HoldingLike): "native" | "bridged" {
+  const kind = holding.representation?.kind ?? holding.balance?.kind;
+
+  if (kind) {
+    return kind;
+  }
+
+  const chain = holding.representation?.chain ?? holding.balance?.chain;
+
+  return chain === "base" ? "bridged" : "native";
+}
+
+function buildNativeBridgedSummary(
+  nativeHeldSignsInput: readonly ZodiacSign[],
+  bridgedHeldSignsInput: readonly ZodiacSign[]
+): ZodiacNativeBridgedSummary {
+  const nativeHeldSigns = orderSigns(nativeHeldSignsInput);
+  const bridgedHeldSigns = orderSigns(bridgedHeldSignsInput);
+  const nativeSet = new Set(nativeHeldSigns);
+  const bridgedSet = new Set(bridgedHeldSigns);
+  const heldSigns = ZODIAC_SIGNS.filter((sign) => nativeSet.has(sign) || bridgedSet.has(sign));
+  const dualRepresentationSigns = ZODIAC_SIGNS.filter(
+    (sign) => nativeSet.has(sign) && bridgedSet.has(sign)
+  );
+  const nativeCount = nativeHeldSigns.length;
+  const bridgedCount = bridgedHeldSigns.length;
+  const dualRepresentationCount = dualRepresentationSigns.length;
+  const totalUniqueSigns = heldSigns.length;
+  const totalRepresentationPositions = nativeCount + bridgedCount;
+
   return {
-    nativeHeld,
-    bridgedHeld,
-    combinedHeld: nativeHeld + bridgedHeld,
-    heldSigns: getHeldSigns(ownership)
+    nativeHeldSigns,
+    bridgedHeldSigns,
+    dualRepresentationSigns,
+    nativeCount,
+    bridgedCount,
+    dualRepresentationCount,
+    totalUniqueSigns,
+    totalRepresentationPositions,
+    nativeHeld: nativeCount,
+    bridgedHeld: bridgedCount,
+    combinedHeld: totalUniqueSigns,
+    heldSigns
   };
+}
+
+function orderSigns(signs: readonly ZodiacSign[]): readonly ZodiacSign[] {
+  const signSet = new Set(signs);
+  return ZODIAC_SIGNS.filter((sign) => signSet.has(sign));
 }
 
 function getDominantCompositionKey<T extends string>(composition: Record<T, number>): T | null {
@@ -646,6 +689,9 @@ function getReceiptFacts(input: {
   readonly dominantModality: ZodiacModality | null;
   readonly nativeCount: number;
   readonly bridgedCount: number;
+  readonly dualRepresentationCount: number;
+  readonly totalUniqueSigns: number;
+  readonly totalRepresentationPositions: number;
 }): readonly ZodiacReceiptFact[] {
   return [
     { label: "Held signs", value: String(input.heldSigns.length) },
@@ -655,7 +701,9 @@ function getReceiptFacts(input: {
     { label: "Dominant element", value: input.dominantElement ?? "balanced" },
     { label: "Dominant modality", value: input.dominantModality ?? "balanced" },
     { label: "Solana-native signs", value: String(input.nativeCount) },
-    { label: "Base-bridged signs", value: String(input.bridgedCount) }
+    { label: "Base-bridged signs", value: String(input.bridgedCount) },
+    { label: "Dual representation signs", value: String(input.dualRepresentationCount) },
+    { label: "Representation positions", value: String(input.totalRepresentationPositions) }
   ];
 }
 

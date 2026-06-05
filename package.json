@@ -5,13 +5,15 @@
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "build": "corepack pnpm --filter @zodiacs/sdk build && corepack pnpm --filter zodiacs-base-app-example build && corepack pnpm --filter zodiacs-sdk-nextjs-example build",
-    "exports:smoke": "corepack pnpm --filter @zodiacs/sdk build && corepack pnpm --filter @zodiacs/sdk exports:smoke",
+    "exports:smoke": "corepack pnpm --filter @zodiacs/sdk exports:smoke",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,json,md,yml,yaml}\"",
     "lint": "corepack pnpm --filter @zodiacs/sdk typecheck",
+    "neutrality:guard": "corepack pnpm --filter @zodiacs/sdk neutrality:guard",
+    "package:contents": "corepack pnpm --filter @zodiacs/sdk package:contents",
     "pack:dry-run": "cd packages/sdk && npm pack --dry-run",
     "registry:checksum": "corepack pnpm --filter @zodiacs/sdk registry:checksum",
-    "typecheck": "corepack pnpm --filter @zodiacs/sdk typecheck && corepack pnpm --filter @zodiacs/sdk build && corepack pnpm --filter zodiacs-base-app-example typecheck && corepack pnpm --filter zodiacs-sdk-nextjs-example typecheck",
+    "typecheck": "corepack pnpm --filter @zodiacs/sdk typecheck && corepack pnpm --filter zodiacs-base-app-example typecheck && corepack pnpm --filter zodiacs-sdk-nextjs-example typecheck",
     "test": "vitest run --fileParallelism=false",
     "clean": "corepack pnpm -r exec rm -rf dist tsconfig.tsbuildinfo"
   },

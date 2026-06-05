@@ -11,3 +11,6 @@
   identity-receipt APIs.
 - Added explicit unavailable-sign reporting so failed reads are not treated as
   confirmed absent holdings.
+- Reconciled native, bridged, dual-representation, unique-sign, and
+  representation-position counts across generic and cross-chain identity
+  helpers.

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "typecheck": "rm -rf .next && tsc --noEmit --incremental false"
+    "typecheck": "rm -rf .next && tsc -p tsconfig.typecheck.json"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.11",

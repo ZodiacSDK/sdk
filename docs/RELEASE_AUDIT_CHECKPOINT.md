@@ -8,8 +8,11 @@ SDK canonical registry and read-only integration layer.
 - `@zodiacs/sdk` package version `1.0.0-rc.1` in `packages/sdk`
 - machine-readable registry artifact at `packages/sdk/registry/zodiacs.registry.json`
 - generic Next.js integration example in `examples/nextjs`
-- root, core, and market entry points are React-free; React hooks and UI live
-  behind explicit `/react` and `/ui` subpaths
+- root, core, registry, Base, Solana, identity, testing, and market entry
+  points are React-free; React hooks and UI live behind explicit `/react` and
+  `/ui` subpaths
+- market adapters are not exported from the root package and require explicit
+  `@zodiacs/sdk/market` imports
 
 The workspace is managed with pnpm through `pnpm-workspace.yaml`.
 
@@ -23,7 +26,9 @@ The workspace is managed with pnpm through `pnpm-workspace.yaml`.
 - Read-only Solana balance helpers and explicit Solana aliases.
 - Read-only Base balance helpers using `viem` `PublicClient` only.
 - Cross-chain ownership and public shelf helpers.
-- Identity context helpers for held signs, confirmed absent signs, element mix, modality mix, wheel state, seasonal context, and receipt data.
+- Identity context helpers for held signs, confirmed absent signs, unavailable
+  signs, element mix, modality mix, wheel state, native/bridged/dual
+  representation counts, seasonal context, and receipt data.
 - React hooks and UI components for registry verification, ownership, and identity surfaces.
 - Optional market context adapters for DEX Screener, Jupiter, and placeholder data.
 
@@ -39,10 +44,18 @@ The workspace is managed with pnpm through `pnpm-workspace.yaml`.
 
 ## Read Behavior
 
-- Solana reads use public wallet addresses and token mint addresses.
-- Base reads use `PublicClient.readContract` for ERC-20 `balanceOf`; registry
-  decimals are used when present, with on-chain `decimals` as a fallback.
+- Solana ownership reads prefer wallet-level token account discovery and fall
+  back to per-mint reads when the RPC does not support that scan.
+- Base ownership reads prefer `PublicClient.readContracts` and fall back to
+  `readContract` when batching is unavailable.
 - Read failures return typed unavailable states per token.
+- `unavailableSigns` identify signs that could not be checked.
+- `confirmedAbsentSigns` identify signs that were checked and had zero balance.
+- Deprecated `missingSigns` aliases only `confirmedAbsentSigns`; failed reads
+  are never treated as confirmed absent.
+- Identity helpers expose reconciled counts where
+  `nativeCount + bridgedCount - dualRepresentationCount === totalUniqueSigns`
+  and `totalRepresentationPositions === nativeCount + bridgedCount`.
 - Cross-chain helpers expose per-chain holdings before any unified shelf view.
 - Large Base raw balances are formatted through string/bigint-safe helpers.
 
@@ -66,8 +79,14 @@ The workspace is managed with pnpm through `pnpm-workspace.yaml`.
 ```sh
 corepack pnpm install
 corepack pnpm test
+corepack pnpm format:check
+corepack pnpm registry:checksum
 corepack pnpm typecheck
 corepack pnpm build
+corepack pnpm exports:smoke
+corepack pnpm pack:dry-run
+corepack pnpm package:contents
+corepack pnpm neutrality:guard
 ```
 
 Optional release dry-runs:
@@ -93,7 +112,7 @@ The SDK is read-only. It does not request private keys, sign messages, connect
 wallets, submit transactions, provide custody, provide transaction approval
 helpers, or provide asset movement helpers. It is built around official
 registry verification, cultural assets, symbolic identity, public ownership
-state, market context, scarcity, and symbolic endurance.
+state, provenance, and optional market context through explicit imports.
 
 ## Recommended Next Audit Prompt
 

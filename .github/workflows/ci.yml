@@ -39,6 +39,9 @@ jobs:
       - name: Registry checksum
         run: corepack pnpm registry:checksum
 
+      - name: Neutrality guard
+        run: corepack pnpm neutrality:guard
+
       - name: Test
         run: corepack pnpm test
 
@@ -47,6 +50,9 @@ jobs:
 
       - name: Pack dry run
         run: corepack pnpm pack:dry-run
+
+      - name: Package contents
+        run: corepack pnpm package:contents
 
       - name: Export smoke
         run: corepack pnpm exports:smoke

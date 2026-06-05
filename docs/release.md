@@ -26,15 +26,19 @@ corepack pnpm lint
 corepack pnpm format:check
 corepack pnpm typecheck
 corepack pnpm registry:checksum
+corepack pnpm neutrality:guard
 corepack pnpm test
 corepack pnpm build
 corepack pnpm exports:smoke
 corepack pnpm pack:dry-run
+corepack pnpm package:contents
 ```
 
 ## npm Publishing Checklist
 
 - Review `npm --prefix packages/sdk pack --dry-run` output and verify it contains only package files needed by downstream consumers.
+- Run `corepack pnpm package:contents` to fail on raw source, tests, snapshots,
+  build info files, or stale generated junk in the npm package.
 - Verify `dist/*.d.ts` exists for every exported subpath.
 - Verify `packages/sdk/registry/zodiacs.registry.json` and `zodiacs.registry.sha256` are included.
 - Verify `README.md`, `CHANGELOG.md`, `LICENSE`, and package metadata are included.
@@ -59,4 +63,8 @@ A 1.0 release candidate should have:
 - Fixture exports for app test suites.
 - Native iOS read-only API docs.
 - Base app starter checks in CI.
+- `unavailableSigns` and `confirmedAbsentSigns` semantics that never treat
+  failed reads as confirmed absent.
+- Reconciled native/bridged counts where
+  `nativeCount + bridgedCount - dualRepresentationCount === totalUniqueSigns`.
 - Clear security posture and read-only threat model docs.

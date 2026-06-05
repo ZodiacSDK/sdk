@@ -178,6 +178,7 @@ describe("read-only Solana balances", () => {
     expect(ownership.zeroBalanceSigns).toEqual(expect.arrayContaining(["taurus"]));
     expect(ownership.unavailableSigns).toEqual([]);
     expect(ownership.confirmedAbsentSigns).toEqual(expect.arrayContaining(["taurus"]));
+    expect(ownership.missingSigns).toEqual(expect.arrayContaining(["taurus"]));
     expect(ownership.balancesBySign?.aries.rawAmount).toBe("1000000");
     expect(ownership.representations).toHaveLength(12);
     expect(ownership.totalHeld).toBe(1);
@@ -251,5 +252,6 @@ describe("read-only Solana balances", () => {
       warnings: []
     });
     expect(ignored.confirmedAbsentSigns).not.toContain("aries");
+    expect(ignored.missingSigns).not.toContain("aries");
   });
 });

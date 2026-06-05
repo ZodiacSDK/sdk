@@ -77,11 +77,13 @@
     }
   },
   "files": [
-    "dist",
+    "dist/*.d.ts",
+    "dist/*.js",
     "README.md",
     "CHANGELOG.md",
     "LICENSE",
-    "registry"
+    "registry/zodiacs.registry.json",
+    "registry/zodiacs.registry.sha256"
   ],
   "engines": {
     "node": ">=18"
@@ -92,9 +94,11 @@
   "scripts": {
     "build": "tsup src/index.ts src/core.ts src/market.ts src/registry.ts src/base.ts src/solana.ts src/identity.ts src/react.ts src/ui.ts src/testing.ts --format esm --dts --clean --tsconfig tsconfig.build.json --external react --external react/jsx-runtime --external @solana/web3.js --external viem",
     "exports:smoke": "node scripts/module-resolution-smoke.mjs",
+    "neutrality:guard": "node scripts/neutrality-guard.mjs",
+    "package:contents": "node scripts/verify-package-contents.mjs",
     "prepack": "npm run build",
     "registry:checksum": "node scripts/registry-checksum.mjs --check",
-    "typecheck": "tsc -b --pretty false",
+    "typecheck": "tsc -p tsconfig.typecheck.json --pretty false",
     "test": "vitest run src/**/*.test.ts src/**/*.test.tsx"
   },
   "dependencies": {

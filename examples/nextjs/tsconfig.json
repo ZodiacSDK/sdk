@@ -13,12 +13,6 @@
         "name": "next"
       }
     ],
-    "paths": {
-      "@zodiacs/sdk": ["../../packages/sdk/dist/index.d.ts"],
-      "@zodiacs/sdk/core": ["../../packages/sdk/dist/core.d.ts"],
-      "@zodiacs/sdk/react": ["../../packages/sdk/dist/react.d.ts"],
-      "@zodiacs/sdk/ui": ["../../packages/sdk/dist/ui.d.ts"]
-    },
     "esModuleInterop": true,
     "resolveJsonModule": true
   },

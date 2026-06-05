@@ -27,11 +27,23 @@ describe("package entry point posture", () => {
       "./testing",
       "./registry/zodiacs.registry.json"
     ]);
-    expect(packageJson.files).toEqual(["dist", "README.md", "CHANGELOG.md", "LICENSE", "registry"]);
+    expect(packageJson.files).toEqual([
+      "dist/*.d.ts",
+      "dist/*.js",
+      "README.md",
+      "CHANGELOG.md",
+      "LICENSE",
+      "registry/zodiacs.registry.json",
+      "registry/zodiacs.registry.sha256"
+    ]);
     expect(packageJson.peerDependenciesMeta?.react?.optional).toBe(true);
-    expect(packageJson.scripts.typecheck).toBe("tsc -b --pretty false");
+    expect(packageJson.scripts.typecheck).toBe("tsc -p tsconfig.typecheck.json --pretty false");
     expect(packageJson.scripts.build).toContain("src/testing.ts");
     expect(packageJson.scripts["exports:smoke"]).toBe("node scripts/module-resolution-smoke.mjs");
+    expect(packageJson.scripts["package:contents"]).toBe(
+      "node scripts/verify-package-contents.mjs"
+    );
+    expect(packageJson.scripts["neutrality:guard"]).toBe("node scripts/neutrality-guard.mjs");
     expect(packageJson.scripts.prepack).toBe("npm run build");
 
     const rootEntry = readFileSync(new URL("../index.ts", import.meta.url), "utf8");

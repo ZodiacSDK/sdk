@@ -87,14 +87,35 @@ Response:
 
 ```json
 {
-  "heldSigns": ["aries", "taurus"],
-  "wheelCoverage": 16.67,
-  "currentSeasonHeld": true,
-  "receiptFacts": [{ "label": "Verified zodiac holdings", "value": "2" }],
-  "consumerSafe": {
-    "readOnly": true,
-    "walletRequired": false,
-    "headline": "Optional Zodiacs context"
+  "verifiedSigns": ["aries", "taurus"],
+  "chains": {
+    "solana": {
+      "address": "CWKQJJYec89wcx871C8vmyTPc3jhsdoAYs5aGffUtELJ",
+      "verifiedSigns": ["aries"],
+      "confirmedAbsentSigns": ["gemini"],
+      "unavailableSigns": []
+    },
+    "base": {
+      "address": "0x1111111111111111111111111111111111111111",
+      "verifiedSigns": ["taurus"],
+      "confirmedAbsentSigns": ["cancer"],
+      "unavailableSigns": []
+    }
+  },
+  "identityContext": {
+    "heldSigns": ["aries", "taurus"],
+    "confirmedAbsentSigns": [],
+    "wheelCoverage": 16.67,
+    "currentSeasonHeld": true,
+    "nativeHeldSigns": ["aries"],
+    "bridgedHeldSigns": ["taurus"],
+    "dualRepresentationSigns": [],
+    "nativeCount": 1,
+    "bridgedCount": 1,
+    "dualRepresentationCount": 0,
+    "totalUniqueSigns": 2,
+    "totalRepresentationPositions": 2,
+    "receiptFacts": [{ "label": "Verified zodiac holdings", "value": "2" }]
   }
 }
 ```

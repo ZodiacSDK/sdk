@@ -96,6 +96,14 @@ describe("identity composition helpers", () => {
     expect(shelf.label).toBe("combined wallet holdings across official representations");
     expect(shelf.heldSigns).toEqual(["aries", "taurus"]);
     expect(getNativeAndBridgedSummary(ownershipByChain)).toMatchObject({
+      nativeHeldSigns: ["aries"],
+      bridgedHeldSigns: ["taurus"],
+      dualRepresentationSigns: [],
+      nativeCount: 1,
+      bridgedCount: 1,
+      dualRepresentationCount: 0,
+      totalUniqueSigns: 2,
+      totalRepresentationPositions: 2,
       nativeHeld: 1,
       bridgedHeld: 1,
       combinedHeld: 2
@@ -119,8 +127,12 @@ describe("identity composition helpers", () => {
       wheelCoverage: 16.67,
       elementComposition: { fire: 1, earth: 0, air: 1, water: 0 },
       modalityComposition: { cardinal: 1, fixed: 0, mutable: 1 },
+      nativeHeldSigns: ["aries", "gemini"],
+      bridgedHeldSigns: [],
+      dualRepresentationSigns: [],
       nativeCount: 2,
       bridgedCount: 0,
+      dualRepresentationCount: 0,
       currentSeason: {
         sign: "aries",
         startDate: "2026-03-21",
@@ -139,6 +151,9 @@ describe("identity composition helpers", () => {
     expect(context.confirmedAbsentSigns).toHaveLength(10);
     expect(context.missingSigns).toHaveLength(10);
     expect(context.receiptFacts.map((fact) => fact.label)).toContain("Wheel coverage");
+    expect(context.nativeCount + context.bridgedCount - context.dualRepresentationCount).toBe(
+      context.totalUniqueSigns
+    );
   });
 
   it("reports when the current-season sign is not held", () => {
@@ -183,6 +198,14 @@ describe("identity composition helpers", () => {
       currentSeason: { sign: "taurus" },
       currentSeasonHeld: true,
       nativeBridgedSummary: {
+        nativeHeldSigns: ["aries"],
+        bridgedHeldSigns: ["taurus"],
+        dualRepresentationSigns: [],
+        nativeCount: 1,
+        bridgedCount: 1,
+        dualRepresentationCount: 0,
+        totalUniqueSigns: 2,
+        totalRepresentationPositions: 2,
         nativeHeld: 1,
         bridgedHeld: 1,
         combinedHeld: 2,
@@ -204,12 +227,18 @@ describe("identity composition helpers", () => {
       wheelCoverage: 0,
       nativeCount: 0,
       bridgedCount: 0,
+      dualRepresentationCount: 0,
+      totalRepresentationPositions: 0,
       dominantElement: null,
       dominantModality: null,
       currentSeasonHeld: false,
       shareTitle: "No verified Zodiacs holdings"
     });
     expect(context.receiptFacts).toContainEqual({ label: "Held signs", value: "0" });
+    expect(context.receiptFacts).toContainEqual({
+      label: "Representation positions",
+      value: "0"
+    });
   });
 
   it("does not treat unavailable ownership reads as confirmed absent", () => {
@@ -282,12 +311,73 @@ describe("identity composition helpers", () => {
       totalUniqueSigns: 2,
       nativeCount: 1,
       bridgedCount: 2,
+      dualRepresentationCount: 1,
+      totalRepresentationPositions: 3,
+      nativeHeldSigns: ["aries"],
+      bridgedHeldSigns: ["aries", "taurus"],
+      dualRepresentationSigns: ["aries"],
       nativeBridgedSummary: {
+        nativeHeldSigns: ["aries"],
+        bridgedHeldSigns: ["aries", "taurus"],
+        dualRepresentationSigns: ["aries"],
+        nativeCount: 1,
+        bridgedCount: 2,
+        dualRepresentationCount: 1,
+        totalUniqueSigns: 2,
+        totalRepresentationPositions: 3,
         nativeHeld: 1,
         bridgedHeld: 2,
         combinedHeld: 2
       }
     });
+  });
+
+  it("reconciles generic native and bridged representations the same way as cross-chain input", () => {
+    const genericContext = getZodiacIdentityContext({
+      holdings: [
+        {
+          sign: "aries",
+          held: true,
+          representation: { chain: "solana", kind: "native" }
+        },
+        {
+          sign: "aries",
+          held: true,
+          representation: { chain: "base", kind: "bridged" }
+        },
+        {
+          sign: "taurus",
+          held: true,
+          balance: { chain: "base", kind: "bridged" }
+        }
+      ]
+    });
+
+    expect(genericContext).toMatchObject({
+      heldSigns: ["aries", "taurus"],
+      nativeHeldSigns: ["aries"],
+      bridgedHeldSigns: ["aries", "taurus"],
+      dualRepresentationSigns: ["aries"],
+      nativeCount: 1,
+      bridgedCount: 2,
+      dualRepresentationCount: 1,
+      totalUniqueSigns: 2,
+      totalRepresentationPositions: 3
+    });
+    expect(
+      genericContext.nativeCount +
+        genericContext.bridgedCount -
+        genericContext.dualRepresentationCount
+    ).toBe(genericContext.totalUniqueSigns);
+    expect(genericContext.receiptFacts).toEqual(
+      expect.arrayContaining([
+        { label: "Held signs", value: "2" },
+        { label: "Solana-native signs", value: "1" },
+        { label: "Base-bridged signs", value: "2" },
+        { label: "Dual representation signs", value: "1" },
+        { label: "Representation positions", value: "3" }
+      ])
+    );
   });
 
   it("returns wheel, seasonal, and compatibility context", () => {

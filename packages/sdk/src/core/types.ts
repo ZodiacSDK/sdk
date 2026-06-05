@@ -213,6 +213,8 @@ export interface ZodiacsOwnership {
   readonly zeroBalanceSigns?: readonly ZodiacSign[];
   readonly unavailableSigns?: readonly ZodiacSign[];
   readonly confirmedAbsentSigns?: readonly ZodiacSign[];
+  /** @deprecated Use confirmedAbsentSigns for neutral display language. */
+  readonly missingSigns?: readonly ZodiacSign[];
   readonly balancesBySign?: Readonly<Record<ZodiacSign, ZodiacBalance>>;
   readonly representations?: readonly ZodiacRepresentation[];
   readonly totalHeld: number;
@@ -346,8 +348,19 @@ export interface ZodiacIdentityAlignment {
 }
 
 export interface ZodiacNativeBridgedSummary {
+  readonly nativeHeldSigns: readonly ZodiacSign[];
+  readonly bridgedHeldSigns: readonly ZodiacSign[];
+  readonly dualRepresentationSigns: readonly ZodiacSign[];
+  readonly nativeCount: number;
+  readonly bridgedCount: number;
+  readonly dualRepresentationCount: number;
+  readonly totalUniqueSigns: number;
+  readonly totalRepresentationPositions: number;
+  /** @deprecated Use nativeCount. */
   readonly nativeHeld: number;
+  /** @deprecated Use bridgedCount. */
   readonly bridgedHeld: number;
+  /** @deprecated Use totalUniqueSigns. */
   readonly combinedHeld: number;
   readonly heldSigns: readonly ZodiacSign[];
 }
@@ -438,9 +451,14 @@ export interface ZodiacIdentityContext {
   readonly wheelCoverage: number;
   readonly elementComposition: Record<ZodiacElement, number>;
   readonly modalityComposition: Record<ZodiacModality, number>;
+  readonly nativeHeldSigns: readonly ZodiacSign[];
+  readonly bridgedHeldSigns: readonly ZodiacSign[];
+  readonly dualRepresentationSigns: readonly ZodiacSign[];
   readonly nativeCount: number;
   readonly bridgedCount: number;
+  readonly dualRepresentationCount: number;
   readonly totalUniqueSigns: number;
+  readonly totalRepresentationPositions: number;
   readonly currentSeason: ZodiacSeason;
   readonly currentSeasonHeld: boolean;
   readonly dominantElement: ZodiacElement | null;

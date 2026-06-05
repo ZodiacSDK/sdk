@@ -186,6 +186,7 @@ export async function getZodiacsOwnership(
     zeroBalanceSigns,
     unavailableSigns,
     confirmedAbsentSigns: zeroBalanceSigns,
+    missingSigns: zeroBalanceSigns,
     balancesBySign: toBalancesBySign(balances),
     representations: getAllSolanaNativeZodiacs(),
     totalHeld: heldSigns.length,

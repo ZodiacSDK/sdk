@@ -37,6 +37,8 @@ corepack pnpm test
 corepack pnpm build
 corepack pnpm exports:smoke
 corepack pnpm pack:dry-run
+corepack pnpm package:contents
+corepack pnpm neutrality:guard
 ```
 
 ## Public API Rules
@@ -117,4 +119,6 @@ For SDK changes, finish only after:
 - Registry changes include invariant tests and a checksum update.
 - Export changes pass `corepack pnpm exports:smoke`.
 - Package changes pass `corepack pnpm pack:dry-run`.
+- Package contents pass `corepack pnpm package:contents`.
+- Consumer-facing naming changes pass `corepack pnpm neutrality:guard`.
 - A self-review confirms no signing, transaction, custody, private-key, swap, approval, token-gating, or acquisition behavior was introduced.
