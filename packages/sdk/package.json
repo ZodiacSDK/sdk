@@ -1,6 +1,6 @@
 {
   "name": "@zodiacs/sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Official read-only TypeScript SDK for the canonical Zodiacs.org registry, native Solana Zodiacs assets, and official bridged Base representations.",
   "license": "MIT",
   "keywords": [

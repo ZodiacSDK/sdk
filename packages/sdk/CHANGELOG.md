@@ -1,6 +1,6 @@
 # @zodiacs/sdk Changelog
 
-## Unreleased
+## 1.0.1
 
 - Added official circle icon assets and `@zodiacs/sdk/assets` metadata helpers
   for app and website display surfaces.
