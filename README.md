@@ -58,6 +58,7 @@ import { getSolanaZodiacsOwnership } from "@zodiacs/sdk/solana";
 import { useBaseZodiacsOwnership } from "@zodiacs/sdk/react";
 import { ProfileSummaryCard } from "@zodiacs/sdk/ui";
 import { createMockOwnership } from "@zodiacs/sdk/testing";
+import { getZodiacIconAsset } from "@zodiacs/sdk/assets";
 ```
 
 The package ships granular entry points:
@@ -72,6 +73,7 @@ The package ships granular entry points:
 - `@zodiacs/sdk/market` — optional market adapters (no React)
 - `@zodiacs/sdk/react` — React hooks and `ZodiacsProvider`
 - `@zodiacs/sdk/ui` — React UI components
+- `@zodiacs/sdk/assets` — official display asset metadata and packaged icon paths
 
 `react` is an optional peer dependency that is required only when importing
 `@zodiacs/sdk/react` or `@zodiacs/sdk/ui`.
@@ -85,17 +87,18 @@ not exported from the root package.
 
 ## Common Core APIs
 
-| Need                        | Start with                                                          |
-| --------------------------- | ------------------------------------------------------------------- |
-| Verify an official address  | `isOfficialZodiacAddress`, `getRepresentationByAddress`             |
-| Load sign metadata          | `getZodiacAsset`, `getZodiacMetadata`, `listZodiacMetadata`         |
-| Read Solana holdings        | `getSolanaZodiacsOwnership`, `getSolanaZodiacBalance`               |
-| Read Base holdings          | `getBaseZodiacsOwnership`, `getBaseZodiacBalance`                   |
-| Build a cross-chain shelf   | `getCrossChainZodiacsOwnership`, `getUnifiedZodiacShelf`            |
-| Build identity surfaces     | `getZodiacIdentityContext`, `getIdentityReceiptData`                |
-| Show season context         | `getCurrentZodiacSeason`, `getZodiacSeasonProgress`                 |
-| Format balances safely      | `formatTokenAmount`, `formatZodiacBalance`                          |
-| Add optional market context | import `getZodiacMarketByRepresentation` from `@zodiacs/sdk/market` |
+| Need                        | Start with                                                                |
+| --------------------------- | ------------------------------------------------------------------------- |
+| Verify an official address  | `isOfficialZodiacAddress`, `getRepresentationByAddress`                   |
+| Load sign metadata          | `getZodiacAsset`, `getZodiacMetadata`, `listZodiacMetadata`               |
+| Read Solana holdings        | `getSolanaZodiacsOwnership`, `getSolanaZodiacBalance`                     |
+| Read Base holdings          | `getBaseZodiacsOwnership`, `getBaseZodiacBalance`                         |
+| Build a cross-chain shelf   | `getCrossChainZodiacsOwnership`, `getUnifiedZodiacShelf`                  |
+| Build identity surfaces     | `getZodiacIdentityContext`, `getIdentityReceiptData`                      |
+| Show season context         | `getCurrentZodiacSeason`, `getZodiacSeasonProgress`                       |
+| Format balances safely      | `formatTokenAmount`, `formatZodiacBalance`                                |
+| Show official icons         | `getZodiacIconAsset`, `getAllZodiacIconAssets` from `@zodiacs/sdk/assets` |
+| Add optional market context | import `getZodiacMarketByRepresentation` from `@zodiacs/sdk/market`       |
 
 Full export maps live in the source barrels:
 [root](packages/sdk/src/index.ts),
@@ -104,9 +107,35 @@ Full export maps live in the source barrels:
 [base](packages/sdk/src/base.ts),
 [solana](packages/sdk/src/solana.ts),
 [identity](packages/sdk/src/identity.ts),
+[assets](packages/sdk/src/assets.ts),
 [market](packages/sdk/src/market/index.ts),
 [react](packages/sdk/src/react/index.ts), and
 [ui](packages/sdk/src/ui/index.ts).
+
+## Official Display Assets
+
+The SDK package includes normalized official circle icons for the twelve
+Zodiacs signs. Use them for app and website display surfaces that need a
+consistent visual reference for verified zodiac holdings.
+
+```ts
+import { getZodiacIconAsset } from "@zodiacs/sdk/assets";
+
+const leoIcon = getZodiacIconAsset("leo");
+
+console.log(leoIcon.packagePath);
+// "@zodiacs/sdk/assets/zodiac-icons/circle/leo.png"
+```
+
+Bundlers that support image imports can reference the PNG subpaths directly:
+
+```ts
+import leoIconUrl from "@zodiacs/sdk/assets/zodiac-icons/circle/leo.png";
+```
+
+These assets are display references for the official registry. Apps should
+still label Solana-native and Base-bridged provenance clearly when showing
+ownership context.
 
 ## Verify an Address
 

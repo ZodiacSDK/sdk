@@ -29,7 +29,21 @@ const requiredFiles = new Set([
   "dist/ui.js",
   "dist/ui.d.ts",
   "dist/testing.js",
-  "dist/testing.d.ts"
+  "dist/testing.d.ts",
+  "dist/assets.js",
+  "dist/assets.d.ts",
+  "assets/zodiac-icons/circle/aquarius.png",
+  "assets/zodiac-icons/circle/aries.png",
+  "assets/zodiac-icons/circle/cancer.png",
+  "assets/zodiac-icons/circle/capricorn.png",
+  "assets/zodiac-icons/circle/gemini.png",
+  "assets/zodiac-icons/circle/leo.png",
+  "assets/zodiac-icons/circle/libra.png",
+  "assets/zodiac-icons/circle/pisces.png",
+  "assets/zodiac-icons/circle/sagittarius.png",
+  "assets/zodiac-icons/circle/scorpio.png",
+  "assets/zodiac-icons/circle/taurus.png",
+  "assets/zodiac-icons/circle/virgo.png"
 ]);
 
 const dryRun = execFileSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
@@ -75,6 +89,7 @@ function isAllowedPackagePath(file) {
     file === "LICENSE" ||
     file === "registry/zodiacs.registry.json" ||
     file === "registry/zodiacs.registry.sha256" ||
+    /^assets\/zodiac-icons\/circle\/[a-z]+\.png$/u.test(file) ||
     /^dist\/[^/]+\.(d\.ts|js)$/u.test(file)
   );
 }

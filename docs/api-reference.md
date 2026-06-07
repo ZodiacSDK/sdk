@@ -7,6 +7,7 @@ import { getZodiacIdentityContext } from "@zodiacs/sdk/core";
 import { getBaseZodiacsOwnership } from "@zodiacs/sdk/base";
 import { getSolanaZodiacsOwnership } from "@zodiacs/sdk/solana";
 import { getConsumerSafeWalletContext } from "@zodiacs/sdk/identity";
+import { getZodiacIconAsset } from "@zodiacs/sdk/assets";
 import { useBaseZodiacsOwnership } from "@zodiacs/sdk/react";
 import { ProfileSummaryCard } from "@zodiacs/sdk/ui";
 ```
@@ -23,6 +24,7 @@ import { ProfileSummaryCard } from "@zodiacs/sdk/ui";
 - `@zodiacs/sdk/react`: optional React hooks.
 - `@zodiacs/sdk/ui`: optional React UI primitives.
 - `@zodiacs/sdk/testing`: typed fixtures and mock clients.
+- `@zodiacs/sdk/assets`: official display asset metadata and packaged icon paths.
 
 ## Read APIs
 
@@ -57,3 +59,13 @@ Ownership responses distinguish checked absence from read failures:
 - `mergeZodiacsOwnership`
 
 These return display-ready facts, not horoscopes, price predictions, or financial advice.
+
+## Asset APIs
+
+- `getAllZodiacIconAssets()`
+- `getZodiacIconAsset(sign)`
+- `getZodiacIconAssetPath(sign)`
+
+The package also exports direct PNG subpaths such as
+`@zodiacs/sdk/assets/zodiac-icons/circle/leo.png` for bundlers and build
+pipelines that copy image assets.

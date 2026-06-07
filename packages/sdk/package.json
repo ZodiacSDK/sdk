@@ -72,6 +72,11 @@
       "types": "./dist/testing.d.ts",
       "import": "./dist/testing.js"
     },
+    "./assets": {
+      "types": "./dist/assets.d.ts",
+      "import": "./dist/assets.js"
+    },
+    "./assets/zodiac-icons/circle/*.png": "./assets/zodiac-icons/circle/*.png",
     "./registry/zodiacs.registry.json": {
       "default": "./registry/zodiacs.registry.json"
     }
@@ -83,7 +88,8 @@
     "CHANGELOG.md",
     "LICENSE",
     "registry/zodiacs.registry.json",
-    "registry/zodiacs.registry.sha256"
+    "registry/zodiacs.registry.sha256",
+    "assets/zodiac-icons/circle/*.png"
   ],
   "engines": {
     "node": ">=18"
@@ -92,7 +98,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsup src/index.ts src/core.ts src/market.ts src/registry.ts src/base.ts src/solana.ts src/identity.ts src/react.ts src/ui.ts src/testing.ts --format esm --dts --clean --tsconfig tsconfig.build.json --external react --external react/jsx-runtime --external viem",
+    "build": "tsup src/index.ts src/core.ts src/market.ts src/registry.ts src/base.ts src/solana.ts src/identity.ts src/react.ts src/ui.ts src/testing.ts src/assets.ts --format esm --dts --clean --tsconfig tsconfig.build.json --external react --external react/jsx-runtime --external viem",
     "exports:smoke": "node scripts/module-resolution-smoke.mjs",
     "neutrality:guard": "node scripts/neutrality-guard.mjs",
     "package:contents": "node scripts/verify-package-contents.mjs",

@@ -28,6 +28,7 @@ explicit subpaths:
 - `@zodiacs/sdk/market` — optional market adapters (no React)
 - `@zodiacs/sdk/react` — React hooks and `ZodiacsProvider`
 - `@zodiacs/sdk/ui` — React UI components
+- `@zodiacs/sdk/assets` — official display asset metadata and packaged icon paths
 
 `react` is an optional peer dependency that is required only when importing
 `@zodiacs/sdk/react` or `@zodiacs/sdk/ui`.
@@ -48,17 +49,18 @@ not exported from the root package.
 
 ## Common Core APIs
 
-| Need                        | Start with                                                          |
-| --------------------------- | ------------------------------------------------------------------- |
-| Verify an official address  | `isOfficialZodiacAddress`, `getRepresentationByAddress`             |
-| Load sign metadata          | `getZodiacAsset`, `getZodiacMetadata`, `listZodiacMetadata`         |
-| Read Solana holdings        | `getSolanaZodiacsOwnership`, `getSolanaZodiacBalance`               |
-| Read Base holdings          | `getBaseZodiacsOwnership`, `getBaseZodiacBalance`                   |
-| Build a cross-chain shelf   | `getCrossChainZodiacsOwnership`, `getUnifiedZodiacShelf`            |
-| Build identity surfaces     | `getZodiacIdentityContext`, `getIdentityReceiptData`                |
-| Show season context         | `getCurrentZodiacSeason`, `getZodiacSeasonProgress`                 |
-| Format balances safely      | `formatTokenAmount`, `formatZodiacBalance`                          |
-| Add optional market context | import `getZodiacMarketByRepresentation` from `@zodiacs/sdk/market` |
+| Need                        | Start with                                                                |
+| --------------------------- | ------------------------------------------------------------------------- |
+| Verify an official address  | `isOfficialZodiacAddress`, `getRepresentationByAddress`                   |
+| Load sign metadata          | `getZodiacAsset`, `getZodiacMetadata`, `listZodiacMetadata`               |
+| Read Solana holdings        | `getSolanaZodiacsOwnership`, `getSolanaZodiacBalance`                     |
+| Read Base holdings          | `getBaseZodiacsOwnership`, `getBaseZodiacBalance`                         |
+| Build a cross-chain shelf   | `getCrossChainZodiacsOwnership`, `getUnifiedZodiacShelf`                  |
+| Build identity surfaces     | `getZodiacIdentityContext`, `getIdentityReceiptData`                      |
+| Show season context         | `getCurrentZodiacSeason`, `getZodiacSeasonProgress`                       |
+| Format balances safely      | `formatTokenAmount`, `formatZodiacBalance`                                |
+| Show official icons         | `getZodiacIconAsset`, `getAllZodiacIconAssets` from `@zodiacs/sdk/assets` |
+| Add optional market context | import `getZodiacMarketByRepresentation` from `@zodiacs/sdk/market`       |
 
 Full export maps live in the source barrels:
 [root](https://github.com/ZodiacsOfficial/sdk/blob/main/packages/sdk/src/index.ts),
@@ -67,6 +69,7 @@ Full export maps live in the source barrels:
 [base](https://github.com/ZodiacsOfficial/sdk/blob/main/packages/sdk/src/base.ts),
 [solana](https://github.com/ZodiacsOfficial/sdk/blob/main/packages/sdk/src/solana.ts),
 [identity](https://github.com/ZodiacsOfficial/sdk/blob/main/packages/sdk/src/identity.ts),
+[assets](https://github.com/ZodiacsOfficial/sdk/blob/main/packages/sdk/src/assets.ts),
 [market](https://github.com/ZodiacsOfficial/sdk/blob/main/packages/sdk/src/market/index.ts),
 [react](https://github.com/ZodiacsOfficial/sdk/blob/main/packages/sdk/src/react/index.ts), and
 [ui](https://github.com/ZodiacsOfficial/sdk/blob/main/packages/sdk/src/ui/index.ts).
@@ -75,6 +78,13 @@ Full export maps live in the source barrels:
 import { getZodiacIdentityContext } from "@zodiacs/sdk/core";
 import { getBaseZodiacsOwnership } from "@zodiacs/sdk/base";
 import { getSolanaZodiacsOwnership } from "@zodiacs/sdk/solana";
+```
+
+```ts
+import { getZodiacIconAsset } from "@zodiacs/sdk/assets";
+
+const leoIcon = getZodiacIconAsset("leo");
+console.log(leoIcon.packagePath);
 ```
 
 ```ts

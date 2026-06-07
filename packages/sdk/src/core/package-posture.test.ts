@@ -25,6 +25,8 @@ describe("package entry point posture", () => {
       "./react",
       "./ui",
       "./testing",
+      "./assets",
+      "./assets/zodiac-icons/circle/*.png",
       "./registry/zodiacs.registry.json"
     ]);
     expect(packageJson.files).toEqual([
@@ -34,11 +36,13 @@ describe("package entry point posture", () => {
       "CHANGELOG.md",
       "LICENSE",
       "registry/zodiacs.registry.json",
-      "registry/zodiacs.registry.sha256"
+      "registry/zodiacs.registry.sha256",
+      "assets/zodiac-icons/circle/*.png"
     ]);
     expect(packageJson.peerDependenciesMeta?.react?.optional).toBe(true);
     expect(packageJson.scripts.typecheck).toBe("tsc -p tsconfig.typecheck.json --pretty false");
     expect(packageJson.scripts.build).toContain("src/testing.ts");
+    expect(packageJson.scripts.build).toContain("src/assets.ts");
     expect(packageJson.scripts["exports:smoke"]).toBe("node scripts/module-resolution-smoke.mjs");
     expect(packageJson.scripts["package:contents"]).toBe(
       "node scripts/verify-package-contents.mjs"

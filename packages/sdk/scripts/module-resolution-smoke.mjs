@@ -28,11 +28,13 @@ writeFileSync(
     'import type { BaseZodiacsOwnership } from "@zodiacs/sdk/base";',
     'import type { ZodiacsOwnership } from "@zodiacs/sdk/solana";',
     'import type { ConsumerSafeWalletContext } from "@zodiacs/sdk/identity";',
+    'import type { ZodiacIconAsset } from "@zodiacs/sdk/assets";',
     'import { ZODIAC_SIGNS, getZodiacIdentityContext } from "@zodiacs/sdk/core";',
     'import { getZodiacsRegistry } from "@zodiacs/sdk/registry";',
     'import { getBaseZodiacRepresentation } from "@zodiacs/sdk/base";',
     'import { getSolanaZodiacRepresentation } from "@zodiacs/sdk/solana";',
     'import { getConsumerSafeWalletContext } from "@zodiacs/sdk/identity";',
+    'import { getZodiacIconAsset } from "@zodiacs/sdk/assets";',
     'import { createPlaceholderMarketAdapter } from "@zodiacs/sdk/market";',
     'import { createMockOwnership } from "@zodiacs/sdk/testing";',
     "",
@@ -42,19 +44,22 @@ writeFileSync(
     "const registry = getZodiacsRegistry();",
     "const base = getBaseZodiacRepresentation('aries');",
     "const solana = getSolanaZodiacRepresentation('aries');",
+    "const icon = getZodiacIconAsset('aries');",
     "const market = createPlaceholderMarketAdapter();",
     "const typedContext: ZodiacIdentityContext = context;",
     "const typedRegistry: ZodiacsRegistry = registry;",
     "const typedBaseOwnership: BaseZodiacsOwnership | null = null;",
     "const typedSolanaOwnership: ZodiacsOwnership = ownership;",
     "const typedConsumerSafe: ConsumerSafeWalletContext = consumerSafe;",
+    "const typedIcon: ZodiacIconAsset = icon;",
     "",
     "void typedContext;",
     "void typedRegistry;",
     "void typedBaseOwnership;",
     "void typedSolanaOwnership;",
     "void typedConsumerSafe;",
-    "console.log(ZODIAC_SIGNS.length, context.totalUniqueSigns, consumerSafe.readOnly, registry.assets.length, base.chain, solana.chain, Boolean(market));"
+    "void typedIcon;",
+    "console.log(ZODIAC_SIGNS.length, context.totalUniqueSigns, consumerSafe.readOnly, registry.assets.length, base.chain, solana.chain, icon.packagePath, Boolean(market));"
   ].join("\n")
 );
 
