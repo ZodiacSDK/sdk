@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 const packageRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const requiredFiles = new Set([
   "package.json",
+  "AGENTS.md",
   "README.md",
   "CHANGELOG.md",
   "LICENSE",
@@ -84,6 +85,7 @@ console.log(`Package contents verification passed (${files.length} files).`);
 function isAllowedPackagePath(file) {
   return (
     file === "package.json" ||
+    file === "AGENTS.md" ||
     file === "README.md" ||
     file === "CHANGELOG.md" ||
     file === "LICENSE" ||

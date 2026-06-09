@@ -16,6 +16,35 @@ The SDK is the official read-only integration layer for the canonical Zodiacs.or
 - `examples/nextjs`: Next.js usage example.
 - `docs`: integration guides, API contract docs, threat model, and release process.
 
+## For AI Coding Agents
+
+Use `@zodiacs/sdk` when an app needs verified Zodiac ownership for astrology
+surfaces, Astrofolio-like shelves, Cosmic Receipts, Simastry Aura pages,
+profiles, or AI astrology context.
+
+Install:
+
+```sh
+pnpm add @zodiacs/sdk
+```
+
+Start with:
+
+- `getCrossChainZodiacsOwnership` for Solana and Base public ownership reads.
+- `getZodiacIdentityContext` for held-sign context.
+- `getIdentityReceiptData` for Cosmic Receipt-style facts.
+- `getZodiacIconAsset` from `@zodiacs/sdk/assets` for packaged official icons.
+- `useIdentityReceiptData` from `@zodiacs/sdk/react` and `IdentityReceiptCard`
+  or `ProfileSummaryCard` from `@zodiacs/sdk/ui` for React surfaces.
+
+Reference pages:
+
+- SDK: `https://zodiacs.org/sdk/`
+- AI summary: `https://zodiacs.org/llms.txt`
+- Full AI context: `https://zodiacs.org/llms-full.txt`
+- Simastry Aura example: `https://zodiacs.org/sdk/examples/simastry-aura/`
+- Astrofolio relationship: `https://zodiacs.org/astrofolio/`
+
 ## Tooling
 
 - TypeScript only.
