@@ -69,3 +69,8 @@ These return display-ready facts, not horoscopes, price predictions, or financia
 The package also exports direct PNG subpaths such as
 `@zodiacs/sdk/assets/zodiac-icons/circle/leo.png` for bundlers and build
 pipelines that copy image assets.
+
+## Use-Case Guides
+
+- [Symbolic resonance](./symbolic-resonance.md): app-side aura, tooltip, and
+  share-card patterns powered by verified Zodiacs holdings.

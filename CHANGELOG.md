@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added a neutral symbolic resonance use-case guide with user-facing facet copy
+  for app-side aura, tooltip, and share-card experiences.
+
 ## 1.0.1
 
 - Added official circle icon assets and `@zodiacs/sdk/assets` metadata helpers

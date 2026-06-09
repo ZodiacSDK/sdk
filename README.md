@@ -356,6 +356,8 @@ identity surfaces.
 - `docs/solana-integration.md`
 - `docs/react-hooks.md`
 - `docs/ui-components.md`
+- `docs/assets.md`
+- `docs/symbolic-resonance.md`
 - `docs/base-app-starter.md`
 - `docs/ios-react-native.md`
 - `docs/native-ios.md`

@@ -44,6 +44,7 @@ not exported from the root package.
 
 - Registry JSON package subpath: `@zodiacs/sdk/registry/zodiacs.registry.json`
 - Registry JSON source: [packages/sdk/registry/zodiacs.registry.json](https://github.com/ZodiacsOfficial/sdk/blob/main/packages/sdk/registry/zodiacs.registry.json)
+- Symbolic resonance use case: [docs/symbolic-resonance.md](https://github.com/ZodiacsOfficial/sdk/blob/main/docs/symbolic-resonance.md)
 - GitHub repository: [ZodiacsOfficial/sdk](https://github.com/ZodiacsOfficial/sdk)
 - Next.js example app: [examples/nextjs](https://github.com/ZodiacsOfficial/sdk/tree/main/examples/nextjs)
 

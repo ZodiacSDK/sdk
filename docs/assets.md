@@ -66,3 +66,6 @@ interface shows ownership, also label provenance clearly:
 Do not use the icons to imply that unofficial assets are official. If an app
 shows user-provided or unverified assets, keep those visually distinct from the
 official registry assets.
+
+For app-side aura and tooltip patterns that combine ownership, identity context,
+and these icons, see [Symbolic Resonance](./symbolic-resonance.md).
