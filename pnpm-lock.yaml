@@ -101,6 +101,12 @@ importers:
         specifier: ^5.6.3
         version: 5.9.3
 
+  examples/simastry-aura:
+    dependencies:
+      '@zodiacs/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
+
   packages/sdk:
     dependencies:
       viem:
