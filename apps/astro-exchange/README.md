@@ -9,10 +9,17 @@ leaderboard carries no prizes or rewards.
 
 ## How it fits the monorepo
 
-- Lives in `apps/astro-exchange`, outside the SDK release gates. App CI runs via
-  `.github/workflows/app-ci.yml` on `apps/**` changes.
+**This workspace is the Zodia Base App, fully separated from the SDK.** The boundary, also
+codified in this directory's `AGENTS.md`:
+
+- Zero changes to `packages/sdk/**`, `docs/**`, or `examples/**` — the SDK stays read-only and
+  app-neutral, and its release gates are unaffected.
+- The only repo-level files the app touches are `pnpm-workspace.yaml` (registers `apps/*`),
+  the root `vitest.config.ts` (excludes `apps/**` from SDK test gates), the separate
+  path-filtered `.github/workflows/app-ci.yml`, and the shared `pnpm-lock.yaml`.
 - `@zodiacs/sdk` is consumed read-only: registry addresses, ownership reads, identity context,
-  market adapters, UI components. All trading, scoring, and social code stays in this app.
+  market adapters, UI components, official icons. All trading, scoring, and social code stays
+  in this app.
 - Wording note: repo guard scripts block a few terms; for anything moon-related say
   "moon phase" or "moon cycle" (never the moon word ending in "-ar").
 
