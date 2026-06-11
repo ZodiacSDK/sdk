@@ -87,11 +87,6 @@ export function ProfilePanel() {
           </div>
         </>
       )}
-
-      <p className="disclaimer">
-        Holdings are public on-chain reads of the official Zodiacs.org registry representations.
-        Symbolic context only.
-      </p>
     </>
   );
 }

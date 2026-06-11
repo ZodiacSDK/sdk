@@ -14,10 +14,10 @@ export function HoroscopeCard({
   return (
     <section className="card">
       <div className="row">
-        <SignIcon sign={sign} size={46} />
+        <SignIcon sign={sign} size={54} />
         <div>
-          <h2 style={{ margin: 0, textTransform: "capitalize" }}>{sign}</h2>
-          <p className="muted" style={{ margin: 0 }}>
+          <h2 style={{ margin: 0, fontSize: 20, textTransform: "capitalize" }}>{sign}</h2>
+          <p style={{ margin: 0, fontSize: 13, color: "var(--accent)", fontWeight: 600 }}>
             {reading.vibe}
           </p>
         </div>

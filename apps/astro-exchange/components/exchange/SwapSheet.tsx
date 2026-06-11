@@ -214,9 +214,9 @@ export function SwapSheet({
           </p>
         ) : null}
 
-        <p className="disclaimer">
-          Swaps execute in your wallet at your own discretion. Entertainment-themed interface; not
-          investment advice. Only swaps started here count toward the leaderboard.
+        <p className="disclaimer" style={{ textAlign: "center" }}>
+          Swaps execute in your wallet · only in-app swaps count on the board · not investment
+          advice
         </p>
       </div>
     </>

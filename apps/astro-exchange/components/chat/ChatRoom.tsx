@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { authedJson } from "../../lib/clientApi";
 import type { ChatMessage } from "../../app/api/chat/route";
+import { EmptyState } from "../EmptyState";
 
 export function ChatRoom() {
   const { context } = useMiniKit();
@@ -74,7 +75,24 @@ export function ChatRoom() {
           </div>
         ))}
         {data && data.messages.length === 0 ? (
-          <p className="muted">Silence in the cosmos. Say something.</p>
+          <EmptyState
+            icon={
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 11.5c0 4.1-4 7.5-9 7.5-1 0-2-.13-2.9-.38L4 20l1.2-3.4C3.8 15.3 3 13.5 3 11.5 3 7.4 7 4 12 4s9 3.4 9 7.5z" />
+              </svg>
+            }
+            title="Quiet in here"
+            hint="Say gm to the cosmos — first message sets the tone."
+          />
         ) : null}
       </div>
 

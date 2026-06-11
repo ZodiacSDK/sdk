@@ -4,7 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { authHeaders } from "../../../lib/clientApi";
 import type { BoardResponse } from "../../../lib/trades/leaderboard";
+import { AppHeader, FooterNote } from "../../../components/AppHeader";
 import { LeaderboardTable } from "../../../components/board/LeaderboardTable";
+import { Segmented } from "../../../components/Segmented";
 
 export default function BoardPage() {
   const [board, setBoard] = useState<"volume" | "pnl">("volume");
@@ -26,46 +28,32 @@ export default function BoardPage() {
 
   return (
     <>
-      <section className="card">
-        <h2>Cosmic leaderboard</h2>
-        <div className="chips">
-          <button
-            className="chip"
-            data-active={board === "volume"}
-            onClick={() => setBoard("volume")}
-          >
-            Volume
-          </button>
-          <button className="chip" data-active={board === "pnl"} onClick={() => setBoard("pnl")}>
-            PnL
-          </button>
-          <button
-            className="chip"
-            data-active={window === "weekly"}
-            onClick={() => setWindow("weekly")}
-          >
-            This week
-          </button>
-          <button
-            className="chip"
-            data-active={window === "alltime"}
-            onClick={() => setWindow("alltime")}
-          >
-            All time
-          </button>
-        </div>
-        {board === "pnl" && window === "weekly" ? (
-          <p className="muted">Weekly PnL counts realized results inside the week.</p>
-        ) : null}
-      </section>
+      <AppHeader title="Leaderboard" subtitle="In-app swaps only · no prizes" />
 
-      {isLoading ? <p className="muted">Summoning the rankings…</p> : null}
+      <Segmented
+        value={board}
+        onChange={setBoard}
+        options={[
+          { value: "volume", label: "Volume" },
+          { value: "pnl", label: "PnL" }
+        ]}
+      />
+      <Segmented
+        value={window}
+        onChange={setWindow}
+        options={[
+          { value: "weekly", label: "This week" },
+          { value: "alltime", label: "All time" }
+        ]}
+      />
+
+      {isLoading ? <p className="muted">Loading rankings…</p> : null}
       {data ? <LeaderboardTable response={data} /> : null}
 
-      <p className="disclaimer">
-        Boards rank only swaps started inside this app, valued in USD at credit time. Entertainment
-        leaderboard — no prizes, no rewards, nothing redeemable. Not investment advice.
-      </p>
+      <FooterNote>
+        Ranks count only swaps started inside this app, valued in USD at credit time. Entertainment
+        leaderboard — nothing redeemable.
+      </FooterNote>
     </>
   );
 }

@@ -1,21 +1,14 @@
 "use client";
 
+import { AppHeader, FooterNote } from "../../../components/AppHeader";
 import { ChatRoom } from "../../../components/chat/ChatRoom";
 
 export default function ChatPage() {
   return (
     <>
-      <section className="card">
-        <h2>Trollbox</h2>
-        <p className="muted">
-          One global room for all twelve signs. Blame retrogrades, not each other.
-        </p>
-      </section>
+      <AppHeader title="Trollbox" subtitle="One room, twelve signs. Blame retrogrades." />
       <ChatRoom />
-      <p className="disclaimer">
-        Be kind. Messages are public, rate-limited, and removable. No financial advice — cosmic or
-        otherwise.
-      </p>
+      <FooterNote>Messages are public and rate-limited. Be kind — no financial advice.</FooterNote>
     </>
   );
 }

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ZODIAC_SIGNS } from "../../../lib/zodiac";
 import type { ZodiacSign } from "../../../lib/zodiac";
 import type { MarketPayload } from "../../../lib/market";
+import { AppHeader, FooterNote } from "../../../components/AppHeader";
 import { SwapSheet } from "../../../components/exchange/SwapSheet";
 import { TokenRow } from "../../../components/exchange/TokenRow";
 
@@ -24,17 +25,11 @@ export default function ExchangePage() {
 
   return (
     <>
-      <section className="card">
-        <h2>The twelve, on Base</h2>
-        <p className="muted">
-          Official bridged representations from the Zodiacs.org registry. Swaps open in your
-          wallet's native swap sheet.
-        </p>
-      </section>
+      <AppHeader title="Exchange" subtitle="The twelve official Zodiacs on Base" />
 
       {isLoading ? <p className="muted">Reading the tape…</p> : null}
 
-      <div style={{ display: "grid", gap: 8 }}>
+      <div className="list">
         {ZODIAC_SIGNS.map((sign) => (
           <TokenRow
             key={sign}
@@ -45,10 +40,10 @@ export default function ExchangePage() {
         ))}
       </div>
 
-      <p className="disclaimer">
-        Nothing here is investment advice. Tokens can be volatile and illiquid; only swap what you
-        can afford to lose. Swaps execute in your wallet, not in this app.
-      </p>
+      <FooterNote>
+        Swaps open and execute in your wallet. Tokens can be volatile and illiquid — not investment
+        advice.
+      </FooterNote>
 
       {active ? (
         <SwapSheet

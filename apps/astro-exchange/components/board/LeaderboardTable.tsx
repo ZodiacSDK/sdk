@@ -1,6 +1,7 @@
 "use client";
 
 import type { BoardResponse } from "../../lib/trades/leaderboard";
+import { EmptyState } from "../EmptyState";
 
 function formatScore(board: "volume" | "pnl", score: number): string {
   const formatted = Intl.NumberFormat("en", {
@@ -17,7 +18,26 @@ export function LeaderboardTable({ response }: { response: BoardResponse }) {
   if (response.entries.length === 0) {
     return (
       <section className="card">
-        <p className="muted">No entries yet. Be the first constellation on the board.</p>
+        <EmptyState
+          icon={
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="9.25" y="6" width="5.5" height="14" rx="1.4" />
+              <rect x="3" y="11" width="5.5" height="9" rx="1.4" />
+              <rect x="15.5" y="9" width="5.5" height="11" rx="1.4" />
+            </svg>
+          }
+          title="No rankings yet"
+          hint="Swaps made inside the app appear here once they confirm on Base."
+        />
       </section>
     );
   }
@@ -28,7 +48,7 @@ export function LeaderboardTable({ response }: { response: BoardResponse }) {
         <tbody>
           {response.entries.map((entry) => (
             <tr key={entry.fid}>
-              <td className="muted" style={{ width: 32 }}>
+              <td className="muted" style={{ width: 32, fontVariantNumeric: "tabular-nums" }}>
                 {entry.rank}
               </td>
               <td>
@@ -41,7 +61,7 @@ export function LeaderboardTable({ response }: { response: BoardResponse }) {
                 </span>
               </td>
               <td
-                style={{ textAlign: "right" }}
+                style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}
                 className={response.board === "pnl" ? (entry.score >= 0 ? "up" : "down") : ""}
               >
                 {formatScore(response.board, entry.score)}
