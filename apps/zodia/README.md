@@ -35,7 +35,7 @@ deterministic template fallback.
 ```sh
 corepack pnpm install
 corepack pnpm --filter @zodiacs/sdk build   # the app imports the built SDK at runtime
-corepack pnpm --filter zodiacs-astro-exchange dev
+corepack pnpm --filter zodia dev
 ```
 
 Copy `.env.example` to `.env.local` and fill in at least the Upstash values. Without Redis the
@@ -47,9 +47,9 @@ only verify on the deployed domain (or with `DEV_FID` set during local developme
 ## Test, typecheck, build
 
 ```sh
-corepack pnpm --filter zodiacs-astro-exchange test
-corepack pnpm --filter zodiacs-astro-exchange typecheck
-corepack pnpm --filter zodiacs-astro-exchange build
+corepack pnpm --filter zodia test
+corepack pnpm --filter zodia typecheck
+corepack pnpm --filter zodia build
 ```
 
 ## How leaderboard credit works

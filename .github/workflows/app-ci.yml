@@ -17,8 +17,8 @@ on:
       - ".github/workflows/app-ci.yml"
 
 jobs:
-  astro-exchange:
-    name: Astro Exchange
+  zodia:
+    name: Zodia
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,13 +37,13 @@ jobs:
         run: corepack pnpm install --frozen-lockfile
 
       - name: Typecheck
-        run: corepack pnpm --filter zodiacs-astro-exchange typecheck
+        run: corepack pnpm --filter zodia typecheck
 
       - name: Test
-        run: corepack pnpm --filter zodiacs-astro-exchange test
+        run: corepack pnpm --filter zodia test
 
       - name: Build SDK
         run: corepack pnpm --filter @zodiacs/sdk build
 
       - name: Build
-        run: corepack pnpm --filter zodiacs-astro-exchange build
+        run: corepack pnpm --filter zodia build
