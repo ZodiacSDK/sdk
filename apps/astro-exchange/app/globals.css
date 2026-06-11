@@ -67,9 +67,47 @@ main.tab-content {
   gap: 14px;
 }
 
-h2 {
-  letter-spacing: -0.02em;
-  font-weight: 700;
+h1,
+h2,
+.display {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+.eyebrow {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 6px;
+}
+
+/* ---------- Skeleton shimmer ---------- */
+
+.skeleton {
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0.04) 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.04) 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 180% 0;
+  }
+  100% {
+    background-position: -20% 0;
+  }
 }
 
 /* ---------- Liquid glass surfaces ---------- */
@@ -120,6 +158,28 @@ h2 {
 
 .down {
   color: var(--down);
+}
+
+/* Hero reading card, tinted by the selected sign's official color. */
+.hero-card {
+  --sign-accent: #ffd166;
+  background:
+    radial-gradient(
+      130% 120% at 12% -10%,
+      color-mix(in srgb, var(--sign-accent) 22%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+  border-color: color-mix(in srgb, var(--sign-accent) 38%, rgba(255, 255, 255, 0.16));
+}
+
+.hero-card .vibe {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 17px;
+  color: color-mix(in srgb, var(--sign-accent) 80%, #ffffff);
+  margin: 0;
 }
 
 /* Official sign icons get a glass ring and soft lift. */
@@ -411,9 +471,8 @@ table.board tr:last-child td {
 
 .app-header h1 {
   margin: 0;
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-size: 30px;
+  letter-spacing: -0.015em;
 }
 
 .app-header p {
@@ -476,8 +535,8 @@ table.board tr:last-child td {
   opacity: 1;
   transform: scale(1.08);
   box-shadow:
-    0 0 0 2px rgba(255, 209, 102, 0.85),
-    0 0 18px rgba(255, 209, 102, 0.45),
+    0 0 0 2px color-mix(in srgb, var(--sign-accent, #ffd166) 90%, transparent),
+    0 0 18px color-mix(in srgb, var(--sign-accent, #ffd166) 50%, transparent),
     0 6px 16px rgba(3, 6, 24, 0.45);
 }
 
@@ -732,11 +791,17 @@ button.list-row:active {
 /* ---------- Season cup ---------- */
 
 .cup-card {
+  --sign-accent: #ffd166;
   display: grid;
   gap: 14px;
   background:
-    radial-gradient(120% 130% at 88% -10%, rgba(255, 209, 102, 0.16), transparent 55%),
+    radial-gradient(
+      120% 130% at 88% -10%,
+      color-mix(in srgb, var(--sign-accent) 20%, transparent),
+      transparent 55%
+    ),
     linear-gradient(135deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.04));
+  border-color: color-mix(in srgb, var(--sign-accent) 32%, rgba(255, 255, 255, 0.16));
 }
 
 .cup-rows {
@@ -774,8 +839,12 @@ button.list-row:active {
 }
 
 .cup-fill[data-first="true"] {
-  background: linear-gradient(90deg, rgba(255, 217, 130, 0.95), rgba(255, 178, 74, 0.9));
-  box-shadow: 0 0 12px rgba(255, 209, 102, 0.5);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--sign-accent, #ffd166) 95%, white),
+    color-mix(in srgb, var(--sign-accent, #ffd166) 75%, transparent)
+  );
+  box-shadow: 0 0 12px color-mix(in srgb, var(--sign-accent, #ffd166) 55%, transparent);
 }
 
 .cup-volume {

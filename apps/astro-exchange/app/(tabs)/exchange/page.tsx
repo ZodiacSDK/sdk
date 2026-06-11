@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ZODIAC_SIGNS } from "../../../lib/zodiac";
 import type { ZodiacSign } from "../../../lib/zodiac";
 import type { MarketPayload } from "../../../lib/market";
-import { AppHeader, FooterNote } from "../../../components/AppHeader";
+import { AppHeader, FooterNote, SkeletonRows } from "../../../components/AppHeader";
 import { SwapSheet } from "../../../components/exchange/SwapSheet";
 import { TapeTickerCard } from "../../../components/TapeFeed";
 import { TokenRow } from "../../../components/exchange/TokenRow";
@@ -30,7 +30,7 @@ export default function ExchangePage() {
 
       <TapeTickerCard />
 
-      {isLoading ? <p className="muted">Reading the tape…</p> : null}
+      {isLoading ? <SkeletonRows count={6} /> : null}
 
       <div className="list">
         {ZODIAC_SIGNS.map((sign) => (

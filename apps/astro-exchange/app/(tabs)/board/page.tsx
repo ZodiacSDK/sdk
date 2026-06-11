@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { authHeaders } from "../../../lib/clientApi";
 import type { BoardResponse } from "../../../lib/trades/leaderboard";
-import { AppHeader, FooterNote } from "../../../components/AppHeader";
+import { AppHeader, FooterNote, SkeletonRows } from "../../../components/AppHeader";
 import { LeaderboardTable } from "../../../components/board/LeaderboardTable";
 import { SeasonCup } from "../../../components/SeasonCup";
 import { Segmented } from "../../../components/Segmented";
@@ -51,7 +51,7 @@ export default function BoardPage() {
         ]}
       />
 
-      {isLoading ? <p className="muted">Loading rankings…</p> : null}
+      {isLoading ? <SkeletonRows count={3} height={56} /> : null}
       {data ? <LeaderboardTable response={data} /> : null}
 
       <section className="card">
