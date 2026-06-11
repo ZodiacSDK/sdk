@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { AuthError, requireFid } from "../../../lib/auth";
 import { allowRequest } from "../../../lib/rateLimit";
-import { keys, redis } from "../../../lib/redis";
+import { hasRedis, keys, redis } from "../../../lib/redis";
 import { upsertProfileSnapshot } from "../../../lib/trades/leaderboard";
 
 export interface ChatMessage {
@@ -23,6 +23,9 @@ const PostSchema = z.object({
 });
 
 export async function GET(request: Request) {
+  if (!hasRedis()) {
+    return NextResponse.json({ messages: [] });
+  }
   const url = new URL(request.url);
   const after = Number(url.searchParams.get("after") ?? 0);
   const raw = await redis().lrange<ChatMessage>(keys.chat(), 0, 99);

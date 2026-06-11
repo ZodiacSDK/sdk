@@ -38,11 +38,13 @@ export default async function Image({ params }: { params: Promise<{ sign: string
         fontSize: 40
       }}
     >
-      <div style={{ fontSize: 140 }}>{SIGN_GLYPHS[valid]}</div>
-      <div style={{ fontSize: 64, textTransform: "capitalize", fontWeight: 700 }}>{valid}</div>
-      <div style={{ fontSize: 44, color: "#ffd166" }}>{reading.vibe}</div>
-      <div style={{ fontSize: 28, color: "#9aa3c7" }}>
-        {date} · Zodiacs Astro Exchange · entertainment only
+      <div style={{ display: "flex", fontSize: 140 }}>{SIGN_GLYPHS[valid]}</div>
+      <div style={{ display: "flex", fontSize: 64, textTransform: "capitalize", fontWeight: 700 }}>
+        {valid}
+      </div>
+      <div style={{ display: "flex", fontSize: 44, color: "#ffd166" }}>{reading.vibe}</div>
+      <div style={{ display: "flex", fontSize: 28, color: "#9aa3c7" }}>
+        {`${date} · Zodiacs Astro Exchange · entertainment only`}
       </div>
     </div>,
     size
