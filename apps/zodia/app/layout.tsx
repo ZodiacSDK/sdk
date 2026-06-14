@@ -27,7 +27,7 @@ const miniAppEmbed = {
   }
 };
 
-const baseBuilderCode = process.env.NEXT_PUBLIC_BASE_BUILDER_CODE?.trim();
+const baseAppId = process.env.NEXT_PUBLIC_BASE_APP_ID?.trim();
 
 export const metadata: Metadata = {
   title: appConfig.name,
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   other: {
     "fc:miniapp": JSON.stringify(miniAppEmbed),
     "fc:frame": JSON.stringify(miniAppEmbed),
-    ...(baseBuilderCode ? { "base:app_id": baseBuilderCode } : {})
+    ...(baseAppId ? { "base:app_id": baseAppId } : {})
   }
 };
 
