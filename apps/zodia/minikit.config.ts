@@ -8,7 +8,7 @@ export const appConfig = {
   description:
     "Daily horoscopes, real planetary events, and the twelve official Zodiacs on Base. " +
     "Astrology content is entertainment only and never investment advice.",
-  primaryCategory: "finance",
+  primaryCategory: "entertainment",
   tags: ["astrology", "zodiac", "horoscope", "base", "social"],
   iconUrl: `${appUrl}/icon.png`,
   splashImageUrl: `${appUrl}/splash.png`,
